@@ -179,13 +179,14 @@ window.BMC_RULES = (function () {
   /* ---------- 7) สีประจำกลุ่มลูกค้า ----------
      คู่กับตัวอักษร A B C D เสมอ ไม่ใช้สีอย่างเดียว
      เพราะคนตาบอดสีราว 8% ของผู้ชายจะแยกไม่ออก */
+  // เลือกค่าที่อ่านออกทั้งพื้นสว่างและพื้นมืด และตัวอักษรขาวบนสีนี้ผ่านเกณฑ์คอนทราสต์
   var SEG_COLORS = [
-    { key:'A', color:'#1d5fa8', soft:'#e3edf8' },
-    { key:'B', color:'#b5400e', soft:'#fbe9e1' },
-    { key:'C', color:'#0d6d5c', soft:'#e0f0ec' },
-    { key:'D', color:'#6b30c4', soft:'#eee6fb' }
+    { key:'A', color:'#2563eb', soft:'#e6edfd' },
+    { key:'B', color:'#ea580c', soft:'#fdeee3' },
+    { key:'C', color:'#be185d', soft:'#fbe7f0' },
+    { key:'D', color:'#7c3aed', soft:'#efe8fd' }
   ];
-  var ALL_COLOR = { key:'ทุกกลุ่ม', color:'#141410', soft:'#eceada' };
+  var ALL_COLOR = { key:'ทุกกลุ่ม', color:'#475569', soft:'#eef1f5' };
 
   /* ---------- 8) ช่องฝั่งลูกค้า ต้องผูกกับกลุ่มลูกค้า ----------
      Osterwalder & Pigneur แบ่ง canvas เป็นสองฝั่ง
