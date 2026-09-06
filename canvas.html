@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="/fonts/anuphan.css">
 <link rel="stylesheet" href="/styles.css">
 <script src="/rules.js"></script>
+<script src="/kb.js" defer></script>
 <link rel="canonical" href="https://restaurantbmc.vercel.app/canvas.html">
 <meta property="og:url" content="https://restaurantbmc.vercel.app/canvas.html">
 <meta name="robots" content="index, follow">
@@ -553,6 +554,53 @@
     return { bep:bep, prime:prime, actual:actual, rev:rev };
   }
 
+
+  /* ---------- ที่ปรึกษาใต้แต่ละช่อง: คำถามชวนคิด + บทความที่เกี่ยวข้อง ---------- */
+  function relatedPosts(block, text, n){
+    var KB = window.BMC_KB;
+    if (!KB) return [];                       // kb.js โหลดแบบ defer อาจยังไม่มา
+    var t = (text || '').toLowerCase();
+    var pool = KB.items.filter(function(it){ return it.b.indexOf(block) >= 0; });
+    pool.forEach(function(it){
+      // ให้คะแนนจากคำที่ตรงกันระหว่างชื่อบทความกับสิ่งที่ผู้ใช้พิมพ์
+      // ภาษาไทยตัดคำไม่ได้ จึงเทียบกับรายการคำที่คัดไว้แทน
+      it._r = it.k.reduce(function(a, k){ return a + (t.indexOf(k.toLowerCase()) >= 0 ? 2 : 0); }, 0);
+      if (it.c === 'feasibility') it._r += 0.6;    // หมวดนี้ตรงกับการวางโมเดลที่สุด
+      if (it.c === 'case-studies') it._r += 0.3;
+    });
+    pool.sort(function(a, b){ return b._r - a._r; });
+    n = n || 3;
+    // เอาบทความที่ตรงคำก่อน ถ้ายังไม่ครบจำนวน ค่อยเติมจากบทความในช่องเดียวกัน
+    var hit = pool.filter(function(it){ return it._r >= 2; }).slice(0, n);
+    if (hit.length < n)
+      hit = hit.concat(pool.filter(function(it){ return hit.indexOf(it) < 0; }).slice(0, n - hit.length));
+    return hit;
+  }
+
+  function drawCoach(){
+    var KB = window.BMC_KB;
+    fields.forEach(function(f){
+      var k = f.dataset.k, cell = f.closest('.f');
+      if (!cell) return;
+      var box = cell.querySelector('.coach');
+      if (!box){ box = document.createElement('div'); box.className = 'coach'; cell.appendChild(box); }
+      var txt = (k === 'vp')
+        ? Object.keys(state.vps).map(function(i){ return state.vps[i]; }).join(' ')
+        : f.value;
+      var asks = (R.ASK[k] || []).filter(function(a){
+        try { return a.when(txt || ''); } catch(e){ return false; }
+      }).slice(0, 2);
+      var posts = (txt || '').trim().length >= 8 ? relatedPosts(k, txt, 2) : [];
+      if (!asks.length && !posts.length){ box.innerHTML = ''; box.style.display = 'none'; return; }
+      box.style.display = '';
+      box.innerHTML = asks.map(function(a){ return '<p class="ask">' + esc(a.q) + '</p>'; }).join('')
+        + (posts.length ? '<p class="rd"><b>ต่อเขียนเรื่องนี้ไว้</b>'
+            + posts.map(function(p){
+                return '<a href="' + KB.site + encodeURIComponent(p.s) + '/" target="_blank" rel="noopener">'
+                     + esc(p.t) + '</a>'; }).join('') + '</p>' : '');
+    });
+  }
+
   /* ---------- ผลตรวจ ---------- */
   var BLOCK_NAME = { vp:'คุณค่าที่ส่งมอบ', cs:'กลุ่มลูกค้า', ch:'ช่องทาง', cr:'ความสัมพันธ์',
                      rs:'รายได้', kr:'ทรัพยากรหลัก', ka:'กิจกรรมหลัก', kp:'พันธมิตรหลัก', co:'โครงสร้างต้นทุน' };
@@ -646,6 +694,8 @@
       out.push({ good:true, k:'ผ่าน', t:'ยังไม่เจอหลุมพรางจากรายการที่ตรวจได้',
                  p:'ระบบตรวจได้แค่รูปแบบ ไม่ได้ตัดสินว่าเนื้อหาลึกพอจริงมั้ย ขั้นต่อไปคือเอาไปคุยกับหุ้นส่วนหรือคนที่รู้จักลูกค้ากลุ่มนี้' });
 
+    drawCoach();
+
     document.getElementById('review').innerHTML = out.map(function(o){
       return '<div class="rv ' + (o.bad ? 'warn-x' : o.good ? 'good' : '') + '">'
            + '<span class="tag">' + esc(o.k) + '</span><div><h4>' + esc(o.t) + '</h4><p>' + o.p + '</p></div></div>';
@@ -673,6 +723,8 @@
     try { localStorage.removeItem(KEY); OLD.forEach(function(k){ localStorage.removeItem(k); }); } catch(e){}
     drawSTP(); drawTGT(); drawVP(); drawChips(); drawStrength(); scoreStrength(); save(); review();
   });
+
+  window.addEventListener('load', function(){ drawCoach(); });
 
   load(); drawSTP(); drawTGT(); drawVP(); drawChips(); drawStrength(); scoreStrength(); save(); review();
 })();

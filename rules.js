@@ -223,10 +223,56 @@ window.BMC_RULES = (function () {
     { min:60, max:70, t:'แข็งแรงมาก',    p:'ถ้าคะแนนนี้มาจากของจริงไม่ใช่ความหวัง โมเดลนี้ขยายได้ ลองทบทวนว่าข้อไหนให้คะแนนตัวเองเกินจริงมั้ย' }
   ];
 
+
+  /* ---------- 10) คำถามที่ที่ปรึกษาจะถามต่อ ----------
+     ไม่ใช่คำเตือนว่าผิด แต่เป็นคำถามที่ทำให้คำตอบลึกขึ้น
+     แต่ละข้อโผล่เฉพาะตอนที่ยังไม่มีคำตอบเรื่องนั้นในช่อง
+     when คืนค่า true = ยังไม่ตอบ ให้ถาม */
+  var ASK = {
+    cs: [
+      { q:'เขามาช่วงเวลาไหน และมีเวลากินกี่นาที',      when:function(t){ return !/\d\s*[:.]\d|\d+\s*นาที|เช้า|เที่ยง|บ่าย|เย็น|ดึก/.test(t); } },
+      { q:'จ่ายต่อหัวประมาณเท่าไหร่',                    when:function(t){ return !/\d{2,}/.test(t); } },
+      { q:'มาคนเดียว มากับเพื่อน หรือมาเป็นครอบครัว',    when:function(t){ return !/คนเดียว|กลุ่ม|ครอบครัว|เพื่อน|ทีม|คู่/.test(t); } }
+    ],
+    vp: [
+      { q:'ถ้าร้านเราปิดพรุ่งนี้ เขาจะไปกินที่ไหนแทน',   when:function(t){ return t.length < 40; } },
+      { q:'เขาจ้างเราไปทำงานอะไร ตอบเป็นงาน ไม่ใช่ตัวสินค้า', when:function(t){ return !/เพราะ|เพื่อ|ให้|จะได้|โดยไม่ต้อง/.test(t); } }
+    ],
+    ch: [
+      { q:'แต่ละช่องทางคิดเป็นกี่ % ของยอด',            when:function(t){ return !/%/.test(t); } },
+      { q:'ช่องทางไหนกำไรต่อจานดีที่สุด ไม่ใช่ยอดเยอะที่สุด', when:function(t){ return !/กำไร|มาร์จิ้น|margin/i.test(t); } },
+      { q:'เราเก็บข้อมูลลูกค้าไว้ดึงกลับเองได้มั้ย',      when:function(t){ return !/line|ไลน์|เบอร์|สมาชิก|ฐานลูกค้า/i.test(t); } }
+    ],
+    cr: [
+      { q:'ลูกค้าที่กลับมาซ้ำคิดเป็นกี่ % ของยอด',       when:function(t){ return !/%/.test(t); } },
+      { q:'รีวิวแย่ ใครตอบ และตอบภายในกี่ชั่วโมง',       when:function(t){ return !/รีวิว|ตอบ/.test(t); } }
+    ],
+    rs: [
+      { q:'ยอดต่อบิลเฉลี่ยเท่าไหร่ และกี่บิลต่อวัน',      when:function(t){ return !/\d{2,}/.test(t); } },
+      { q:'มีรายได้ที่ไม่ใช่การขายอาหารมั้ย เช่น ของฝาก จัดเลี้ยง สอน', when:function(t){ return !/ของฝาก|จัดเลี้ยง|สอน|คอร์ส|แฟรนไชส์|สมาชิก|เช่า/.test(t); } }
+    ],
+    kr: [
+      { q:'ถ้าคนที่ทำสูตรลาออกพรุ่งนี้ ร้านยังเปิดได้มั้ย', when:function(t){ return !/สูตร|sop|บันทึก|คู่มือ/i.test(t); } },
+      { q:'ครัวรองรับได้กี่จานต่อชั่วโมง',                when:function(t){ return !/\d+\s*(จาน|แก้ว|ที่นั่ง|โต๊ะ)/.test(t); } }
+    ],
+    ka: [
+      { q:'งานไหนที่ถ้าทำพลาดวันเดียว ลูกค้าจะไม่กลับมา', when:function(t){ return t.length < 40; } },
+      { q:'งานไหนที่เจ้าของยังต้องทำเองอยู่ และจ้างคนอื่นได้มั้ย', when:function(t){ return !/เจ้าของ|จ้าง|outsource|จ้างข้างนอก/i.test(t); } }
+    ],
+    kp: [
+      { q:'ถ้าซัพพลายเออร์เจ้าหลักหายไป หาคนแทนได้ในกี่วัน', when:function(t){ return !/สำรอง|เจ้าที่สอง|แทน|\d+\s*วัน/.test(t); } },
+      { q:'ใครให้เครดิตเทอมเราบ้าง กี่วัน',              when:function(t){ return !/เครดิต|\d+\s*วัน/.test(t); } }
+    ],
+    co: [
+      { q:'ต้นทุนวัตถุดิบกี่ % ค่าแรงกี่ %',              when:function(t){ return !/%/.test(t); } },
+      { q:'ของเสียและของหายนับเป็นต้นทุนแล้วหรือยัง',    when:function(t){ return !/ของเสีย|ของหาย|waste/i.test(t); } }
+    ]
+  };
+
   return { COST:COST, FOOD_COST:FOOD_COST, PRIME_COST_MAX:PRIME_COST_MAX,
            STANDARD:STANDARD, PITFALLS:PITFALLS, FLAGS:FLAGS, CROSS:CROSS,
            STP:STP, TARGETING:TARGETING, REL_TYPES:REL_TYPES,
            SEG_COLORS:SEG_COLORS, ALL_COLOR:ALL_COLOR,
            RIGHT_SIDE:RIGHT_SIDE, LEFT_SIDE:LEFT_SIDE,
-           STRENGTH:STRENGTH, STRENGTH_READ:STRENGTH_READ };
+           STRENGTH:STRENGTH, STRENGTH_READ:STRENGTH_READ, ASK:ASK };
 })();
