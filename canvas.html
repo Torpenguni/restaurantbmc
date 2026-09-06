@@ -54,6 +54,23 @@
 </div>
 
 
+
+<section class="step" id="step-profile">
+  <p class="step-n">เริ่มที่นี่</p>
+  <h2>เล่าเรื่องร้านคุณก่อน</h2>
+  <p class="step-lede">
+    กดเลือกอย่างเดียว ไม่ต้องพิมพ์ ใช้เวลาไม่ถึงนาที —
+    คำแนะนำทั้งหน้าจะอิงบริบทนี้ เพราะคาเฟ่ในตึกออฟฟิศกับปิ้งย่างริมถนน
+    มีเกณฑ์ต้นทุน ทำเล และจังหวะขายคนละเรื่องกันหมด
+  </p>
+  <div id="profile"></div>
+  <label for="pain" style="display:block;font-size:14px;font-weight:600;margin:18px 0 5px">
+    มีเรื่องอะไรที่ค้างใจอยู่ตอนนี้ <span style="font-weight:400;color:var(--ink-faint)">ไม่ใส่ก็ได้</span>
+  </label>
+  <input id="pain" class="shopname" style="width:min(620px,100%)" type="text" autocomplete="off"
+         placeholder="เช่น ยอดตกช่วงบ่าย · ของเสียเยอะ · หาคนไม่ได้">
+</section>
+
 <section class="step" id="step-cs">
   <p class="step-n">ขั้นที่ 1</p>
   <h2>กลุ่มลูกค้า — เราทำร้านให้ "ใคร"</h2>
@@ -63,6 +80,7 @@
   </p>
   <div class="tw"><table class="stp" id="stp"></table></div>
   <p class="scrollhint">← เลื่อนตารางซ้ายขวาเพื่อดูกลุ่มอื่น</p>
+  <div id="picker" class="picker noprint"></div>
   <div class="seg-actions noprint">
     <button class="mini" id="addseg" type="button">+ เพิ่มกลุ่มลูกค้า</button>
     <button class="mini" id="delseg" type="button">− ลบกลุ่มสุดท้าย</button>
@@ -216,7 +234,7 @@
   var status = document.getElementById('status');
 
   var state = { shop:'', blocks:{}, nums:{}, segs:[ blankSeg(), blankSeg() ],
-                vps:{}, tags:{}, str:{} };
+                vps:{}, tags:{}, str:{}, prof:{}, pain:'' };
   function blankSeg(){ return { name:'' }; }
 
   /* ---------- เก็บ/อ่าน ---------- */
@@ -243,15 +261,18 @@
     if (!state.vps)  state.vps  = {};
     if (!state.tags) state.tags = {};
     if (!state.str)  state.str  = {};
+    if (!state.prof) state.prof = {};
     if (!state.blocks) state.blocks = {};
     shop.value = state.shop || '';
     fields.forEach(function(f){ f.value = state.blocks[f.dataset.k] || ''; });
     nums.forEach(function(f){ var v = state.nums[f.dataset.n]; f.value = (v || v === 0) ? v : ''; });
+    document.getElementById('pain').value = state.pain || '';
   }
   function save(){
     state.shop = shop.value;
     fields.forEach(function(f){ state.blocks[f.dataset.k] = f.value; });
     nums.forEach(function(f){ state.nums[f.dataset.n] = f.value; });
+    state.pain = document.getElementById('pain').value;
     try { localStorage.setItem(KEY, JSON.stringify(state)); }
     catch(e){ status.textContent = 'เบราว์เซอร์นี้เซฟไม่ได้ กรุณาพิมพ์เก็บไว้'; return; }
     var n = fields.filter(function(f){ return f.value.trim(); }).length;
@@ -322,6 +343,7 @@
     if (!t.dataset || t.dataset.seg === undefined || !t.dataset.f) return;
     state.segs[+t.dataset.seg][t.dataset.f] = t.value;
     if (t.dataset.f === 'name') { drawTGT(); drawVP(); drawChips(); }
+    drawPicker();
     save(); review();
   }
   document.getElementById('stp').addEventListener('input', onSegInput);
@@ -336,7 +358,7 @@
 
   document.getElementById('addseg').addEventListener('click', function(){
     if (state.segs.length >= MAXSEG) return;
-    state.segs.push(blankSeg()); drawSTP(); drawTGT(); drawVP(); drawChips(); save(); review();
+    state.segs.push(blankSeg()); drawSTP(); drawTGT(); drawVP(); drawChips(); drawPicker(); save(); review();
   });
   document.getElementById('delseg').addEventListener('click', async function(){
     if (state.segs.length <= 1) return;
@@ -345,7 +367,7 @@
         'ข้อมูลทั้งคอลัมน์ของ "' + (last.name || 'กลุ่มที่ ' + state.segs.length) +
         '" จะหายไป รวมถึงคุณค่าและดาวที่ให้ไว้ ทำแล้วย้อนกลับไม่ได้',
         'ลบกลุ่มนี้', true)) return;
-    state.segs.pop(); drawSTP(); drawTGT(); drawVP(); drawChips(); save(); review();
+    state.segs.pop(); drawSTP(); drawTGT(); drawVP(); drawChips(); drawPicker(); save(); review();
   });
 
   document.getElementById('draftcs').addEventListener('click', async function(){
@@ -414,6 +436,7 @@
 
   /* ---------- แถบขั้นตอน ---------- */
   var STEPS = [
+    { id:'step-profile',  n:'0', t:'เรื่องร้านคุณ' },
     { id:'step-cs',       n:'1', t:'กลุ่มลูกค้า' },
     { id:'step-canvas',   n:'2', t:'Canvas 9 ช่อง' },
     { id:'step-nums',     n:'3', t:'ตัวเลข' },
@@ -425,7 +448,9 @@
     var blocks = fields.filter(function(f){ return f.value.trim(); }).length;
     var numsOk = ['rent','staff','cogs'].every(function(k){ return state.nums[k]; });
     var scored = R.STRENGTH.filter(function(q){ return state.str[q.key] !== undefined && state.str[q.key] !== ''; }).length;
+    var prof = R.PROFILE.filter(function(q){ return state.prof[q.key]; }).length;
     return {
+      'step-profile':  { done: prof === R.PROFILE.length, label: prof + '/' + R.PROFILE.length },
       'step-cs':       { done: seg >= 1,        label: seg ? seg + ' กลุ่ม' : '' },
       'step-canvas':   { done: blocks === 9,    label: blocks + '/9' },
       'step-nums':     { done: numsOk,          label: numsOk ? 'ครบ' : '' },
@@ -690,6 +715,81 @@
   }
 
 
+
+  /* ---------- บริบทร้าน + ตัวเลือกด่วนของตาราง STP ----------
+     ทั้งสองส่วนเป็นการกดเลือก ไม่ต้องพิมพ์
+     เพราะจุดที่คนติดมากที่สุดคือไม่รู้ว่าคำตอบควรหน้าตาแบบไหน */
+  function drawProfile(){
+    document.getElementById('profile').innerHTML = R.PROFILE.map(function(q){
+      return '<div class="pq"><span class="lb">' + esc(q.label) + '</span><div class="opts">'
+        + q.opts.map(function(o){
+            var on = state.prof[q.key] === o;
+            return '<button type="button" class="opt' + (on ? ' on' : '') + '" data-p="' + q.key
+                 + '" data-v="' + esc(o) + '">' + esc(o) + '</button>';
+          }).join('') + '</div></div>';
+    }).join('');
+  }
+  document.getElementById('profile').addEventListener('click', function(e){
+    var b = e.target.closest && e.target.closest('.opt[data-p]');
+    if (!b) return;
+    var k = b.dataset.p;
+    state.prof[k] = (state.prof[k] === b.dataset.v) ? '' : b.dataset.v;  // กดซ้ำ = ยกเลิก
+    drawProfile(); save(); review();
+  });
+  function profileText(){
+    var out = R.PROFILE.filter(function(q){ return state.prof[q.key]; })
+      .map(function(q){ return q.label + ': ' + state.prof[q.key]; });
+    if (state.pain) out.push('เรื่องที่ค้างใจ: ' + state.pain);
+    return out.length ? out.join(' · ') : '';
+  }
+
+  var pickSeg = 0;
+  function drawPicker(){
+    var idx = activeSegs();
+    if (!idx.length) idx = [0];
+    if (idx.indexOf(pickSeg) < 0) pickSeg = idx[0];
+    var box = document.getElementById('picker');
+    var head = '<div class="ph"><span class="t">กรอกไม่ถูก กดเลือกได้</span>'
+      + '<span style="font-size:12.5px;color:var(--ink-mute)">เลือกแล้วขึ้นในตารางข้างบนทันที แก้เป็นคำของตัวเองได้</span>'
+      + '<span class="segs">'
+      + idx.map(function(i){
+          var c = segColor(i), on = i === pickSeg;
+          return '<button type="button" data-ps="' + i + '" class="' + (on ? 'on' : '') + '"'
+               + (on ? ' style="background:' + c.color + '"' : '') + '>' + esc(segLabel(i)) + '</button>';
+        }).join('') + '</span></div>';
+
+    var sg = state.segs[pickSeg] || {};
+    var body = '<div class="pb">' + R.STP.map(function(g){
+      return g.rows.filter(function(r){ return R.CHOICES[r.key]; }).map(function(r){
+        var cur = (sg[r.key] || '').trim();
+        return '<div class="pr"><span class="lb">' + esc(r.label)
+          + (cur ? '<span class="cur">— ตอนนี้: ' + esc(cur) + '</span>' : '') + '</span><div class="opts">'
+          + R.CHOICES[r.key].map(function(o){
+              var on = cur.split(' · ').indexOf(o) >= 0;
+              return '<button type="button" class="opt' + (on ? ' on' : '') + '" data-row="' + r.key
+                   + '" data-v="' + esc(o) + '">' + esc(o) + '</button>';
+            }).join('') + '</div></div>';
+      }).join('');
+    }).join('') + '</div>';
+    box.innerHTML = head + body;
+  }
+  document.getElementById('picker').addEventListener('click', function(e){
+    var t = e.target;
+    var seg = t.closest && t.closest('[data-ps]');
+    if (seg){ pickSeg = +seg.dataset.ps; drawPicker(); return; }
+    var b = t.closest && t.closest('.opt[data-row]');
+    if (!b) return;
+    var k = b.dataset.row, v = b.dataset.v;
+    var sg = state.segs[pickSeg];
+    // เลือกได้หลายค่าในแถวเดียว ต่อกันด้วย · กดซ้ำเพื่อเอาออก
+    var cur = (sg[k] || '').trim();
+    var parts = cur ? cur.split(' · ').filter(Boolean) : [];
+    var at = parts.indexOf(v);
+    if (at >= 0) parts.splice(at, 1); else parts.push(v);
+    sg[k] = parts.join(' · ');
+    drawSTP(); drawTGT(); drawVP(); drawChips(); drawPicker(); save(); review();
+  });
+
   /* ---------- ขอความช่วยเหลือเฉพาะช่อง ----------
      ปุ่มเดียวตอนท้ายช่วยได้ตอนกรอกเสร็จแล้ว แต่ตอนที่ต้องการจริงคือ
      ตอนนั่งคิดช่องนั้นอยู่ ปุ่มนี้จึงอยู่ในช่องและส่งเฉพาะข้อมูลที่ช่องนั้นต้องใช้
@@ -726,7 +826,8 @@
     var txt = (k === 'vp')
       ? activeSegs().map(function(i){ return segColor(i).key + ': ' + (state.vps[i] || '(ว่าง)'); }).join('\n')
       : (state.blocks[k] || '');
-    var payload = 'ช่อง: ' + name
+    var prof = profileText();
+    var payload = (prof ? 'บริบทร้าน: ' + prof + '\n' : '') + 'ช่อง: ' + name
       + '\nมาตรฐานของช่องนี้: ' + (R.STANDARD[k] || '-')
       + '\nหลุมพรางที่พบบ่อย: ' + (R.PITFALLS[k] || []).join(' · ')
       + '\nสิ่งที่เขาเขียนไว้ตอนนี้: ' + (txt.trim() || '(ยังว่าง)')
@@ -884,6 +985,8 @@
   /* ---------- ขอความเห็นเชิงลึกจาก AI (ต้องกดเองเท่านั้น) ---------- */
   function canvasAsText(){
     var L = [];
+    var prof = profileText();
+    if (prof) L.push('บริบทร้าน: ' + prof);
     var act = activeSegs();
     act.forEach(function(i){
       var sg = state.segs[i], bits = [];
@@ -973,7 +1076,7 @@
   function expandAll(){ fields.forEach(grow); }
   function resetAll(){ fields.forEach(function(f){ f.style.height = ''; }); }
 
-  fields.concat(nums).concat([shop]).forEach(function(f){
+  fields.concat(nums).concat([shop, document.getElementById('pain')]).forEach(function(f){
     f.addEventListener('input', function(){ save(); review(); });
   });
   document.getElementById('print').addEventListener('click', function(){ expandAll(); window.print(); });
@@ -985,17 +1088,17 @@
         'ทุกอย่างในหน้านี้จะถูกลบ ทั้งตารางกลุ่มลูกค้า Canvas ทั้ง 9 ช่อง ตัวเลข และคะแนน ' +
         'ทำแล้วย้อนกลับไม่ได้ ถ้ายังไม่ได้บันทึกเป็น PDF ให้กดยกเลิกแล้วไปพิมพ์เก็บไว้ก่อน',
         'ล้างทั้งหมด', true)) return;
-    state = { shop:'', blocks:{}, nums:{}, segs:[ blankSeg(), blankSeg() ], vps:{}, tags:{}, str:{} };
-    shop.value = '';
+    state = { shop:'', blocks:{}, nums:{}, segs:[ blankSeg(), blankSeg() ], vps:{}, tags:{}, str:{}, prof:{}, pain:'' };
+    shop.value = ''; document.getElementById('pain').value = '';
     fields.forEach(function(f){ f.value = ''; });
     nums.forEach(function(f){ f.value = ''; });
     try { localStorage.removeItem(KEY); OLD.forEach(function(k){ localStorage.removeItem(k); }); } catch(e){}
-    drawSTP(); drawTGT(); drawVP(); drawChips(); drawStrength(); scoreStrength(); save(); review();
+    drawProfile(); drawSTP(); drawTGT(); drawVP(); drawChips(); drawPicker(); drawStrength(); scoreStrength(); save(); review();
   });
 
   window.addEventListener('load', function(){ drawCoach(); });
 
-  load(); drawStepper(); drawSTP(); drawTGT(); drawVP(); drawChips(); drawStrength(); scoreStrength(); save(); review();
+  load(); drawStepper(); drawProfile(); drawSTP(); drawTGT(); drawVP(); drawChips(); drawPicker(); drawStrength(); scoreStrength(); save(); review();
 })();
 </script>
 

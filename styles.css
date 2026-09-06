@@ -653,3 +653,39 @@ dialog.ask .btn{padding:10px 17px;font-size:14.5px}
   .fill .f textarea{min-height:128px}
 }
 @media print{ .ex > summary{display:none} .ex[open] .hint{display:none} }
+
+/* ---------- คำถามแบบกดเลือก ---------- */
+.pq{margin:0 0 16px}
+.pq > .lb{font-size:14px;font-weight:600;margin:0 0 7px;display:block}
+.pq .opts{display:flex;flex-wrap:wrap;gap:6px}
+.opt{
+  font:inherit;font-size:13.5px;font-weight:500;cursor:pointer;
+  border:1px solid var(--line-2);background:var(--surface);color:var(--ink-2);
+  border-radius:20px;padding:7px 14px;line-height:1.45;
+}
+.opt:hover{border-color:var(--accent);color:var(--accent)}
+.opt.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+
+/* ตัวเลือกด่วนของตาราง STP */
+.picker{
+  border:1px solid var(--line);border-radius:var(--r);background:var(--surface);
+  margin-top:14px;box-shadow:var(--shadow-sm);overflow:hidden;
+}
+.picker .ph{
+  display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+  padding:12px 16px;border-bottom:1px solid var(--line);background:var(--surface-2);
+}
+.picker .ph .t{font-size:14px;font-weight:600}
+.picker .ph .segs{display:flex;gap:5px;margin-left:auto;flex-wrap:wrap}
+.picker .ph .segs button{
+  font:inherit;font-size:12px;font-weight:600;cursor:pointer;border-radius:20px;
+  padding:4px 11px;border:1px solid var(--line-2);background:var(--surface);color:var(--ink-mute);
+}
+.picker .ph .segs button.on{color:#fff;border-color:transparent}
+.picker .pb{padding:14px 16px 16px}
+.picker .pr{padding:9px 0;border-bottom:1px solid var(--line)}
+.picker .pr:last-child{border-bottom:0}
+.picker .pr .lb{font-size:13px;font-weight:600;margin:0 0 6px;display:block;color:var(--ink-2)}
+.picker .opt{font-size:12.5px;padding:5px 11px}
+.picker .cur{font-size:12px;color:var(--ink-faint);margin-left:6px;font-weight:400}
+@media print{ .picker,#step-profile .opts{display:none} }
