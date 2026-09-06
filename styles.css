@@ -634,16 +634,19 @@ dialog.ask .btn{padding:10px 17px;font-size:14.5px}
 .ex > summary:hover{border-color:var(--ink-faint);color:var(--ink)}
 .ex[open] > summary{color:var(--ink);border-color:var(--ink-faint)}
 .ex .hint,.ex .ask,.ex .rd{margin-top:7px}
+/* บังคับซ่อนเองแทนที่จะพึ่งค่าเริ่มต้นของ <details>
+   ทดสอบแล้วพบว่าเบราว์เซอร์ยังคำนวณพื้นที่ให้เนื้อหาทั้งที่ปิดอยู่
+   คำอธิบายจึงยังกินที่และยังเห็นได้ ทั้งที่ตั้งใจให้ซ่อน */
+.ex:not([open]) > *:not(summary){display:none}
 .coach .ex{margin-bottom:0}
 .coach{border-top:0;padding-top:0;margin-top:8px;display:flex;flex-direction:column;gap:7px;align-items:flex-start}
 .askai{margin-top:0}
 
 /* ช่องพิมพ์ใหญ่ขึ้น เพราะได้พื้นที่คืนจากการยุบคำอธิบาย
-   ใส่ max-height ด้วย เพราะ textarea เป็น flex:1 ถ้าไม่จำกัด
-   ช่องที่เนื้อหาน้อยจะถูกยืดตามช่องที่สูงที่สุดในแถวเดียวกัน
-   กลายเป็นกล่องเปล่าสูงเกือบ 500px */
+   ปล่อยให้ยืดเต็มกล่อง (flex:1) ตามรูปทรงของ canvas จริง
+   ที่ช่องพันธมิตรกับคุณค่ากินสองแถว จึงสูงกว่าช่องอื่นโดยธรรมชาติ */
 .fill .f{min-height:268px}
-.fill .f textarea{min-height:150px;max-height:300px;font-size:14.5px}
+.fill .f textarea{min-height:150px;font-size:14.5px}
 .fill .vpseg textarea{min-height:74px}
 @media (max-width:900px){
   .fill .f{min-height:236px}
