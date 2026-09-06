@@ -39,7 +39,7 @@ a{color:inherit}
 }
 .top .wrap{display:flex;align-items:center;gap:16px;min-height:62px}
 .brand{font-weight:700;font-size:19px;text-decoration:none;letter-spacing:-0.01em}
-.brand span{background:var(--note);padding:0 6px;border-radius:3px}
+.brand span{background:var(--note);padding:0 5px;border-radius:3px;letter-spacing:0.01em}
 .top nav{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
 .top nav a{
   text-decoration:none;font-size:15px;font-weight:500;

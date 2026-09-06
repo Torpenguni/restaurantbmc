@@ -1,4 +1,6 @@
-# ผังธุรกิจร้าน — Business Model Canvas สำหรับร้านอาหาร
+# RestaurantBMC
+
+Business Model Canvas สำหรับร้านอาหาร
 
 เว็บภาษาไทยล้วน สำหรับเจ้าของร้านอาหารในไทย มีสองส่วน
 
@@ -10,9 +12,6 @@
 | `fonts/` | Anuphan เก็บไว้เอง ไม่ดึงจาก Google |
 
 ## ที่ต้องตัดสินใจก่อนขึ้นจริง
-
-**ชื่อแบรนด์ยังเป็นชื่อชั่วคราว** — ตอนนี้ใช้ "ผังธุรกิจร้าน" อยู่ 4 จุด
-(`<title>`, `.brand` ในสองหน้า, ฟุตเตอร์สองหน้า) เปลี่ยนได้ด้วยการค้นแทนที่คำเดียว
 
 **ยังไม่มีโดเมนและยังไม่ได้ต่อ Vercel** — ดูหัวข้อ "เอาขึ้นเว็บ" ข้างล่าง
 
@@ -30,12 +29,12 @@
 ยังไม่ได้สร้างรีโปบน GitHub เพราะเครื่องนี้ไม่มี `gh` CLI ทำได้สองทาง
 
 **ทางที่ 1 — ผ่าน GitHub**
-1. สร้างรีโปเปล่าชื่อ `business-model-canvas` ที่ github.com/new (ไม่ต้องติ๊ก README)
+1. สร้างรีโปเปล่าชื่อ `restaurantbmc` ที่ github.com/new (ไม่ต้องติ๊ก README)
 2. รันคำสั่งนี้
 
 ```bash
-cd ~/Documents/business-model-canvas
-git remote add origin https://github.com/Torpenguni/business-model-canvas.git
+cd ~/Documents/restaurantbmc
+git remote add origin https://github.com/Torpenguni/restaurantbmc.git
 git branch -M main
 git push -u origin main
 ```
@@ -45,7 +44,7 @@ git push -u origin main
 **ทางที่ 2 — ขึ้น Vercel ตรงจากเครื่อง** ไม่ต้องใช้ GitHub
 
 ```bash
-cd ~/Documents/business-model-canvas
+cd ~/Documents/restaurantbmc
 npx vercel
 ```
 
