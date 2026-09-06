@@ -85,7 +85,12 @@ module.exports = async (req, res) => {
         model: MODEL,
         max_tokens: MAX_OUTPUT,
         system: SYSTEM,
-        messages: [{ role: 'user', content: canvas }]
+        // prefill ด้วย { บังคับให้โมเดลต่อ JSON เลย
+        // ไม่งั้นบางครั้งมันใส่ ```json ครอบ หรือเกริ่นก่อน แล้วแปลงไม่ได้
+        messages: [
+          { role: 'user', content: canvas },
+          { role: 'assistant', content: '{' }
+        ]
       })
     });
 
@@ -95,12 +100,17 @@ module.exports = async (req, res) => {
     }
 
     const data = await r.json();
-    const text = (data.content || []).map(c => c.text || '').join('');
-    const m = text.match(/\{[\s\S]*\}/);
-    if (!m) return res.status(502).json({ error: 'parse' });
+    let text = (data.content || []).map(c => c.text || '').join('');
+    text = '{' + text;                                  // คืน { ที่ prefill ไป
+    text = text.replace(/```(?:json)?/g, '').trim();    // เผื่อยังมี fence ติดมา
 
-    let out;
-    try { out = JSON.parse(m[0]); } catch (e) { return res.status(502).json({ error: 'parse' }); }
+    let out = null;
+    // ตัดท้ายทีละตัวจนกว่าจะ parse ได้ กันกรณีโมเดลพูดต่อหลังปิดวงเล็บ
+    const end = text.lastIndexOf('}');
+    for (let i = end; i > 0 && !out; i = text.lastIndexOf('}', i - 1)) {
+      try { out = JSON.parse(text.slice(0, i + 1)); } catch (e) { /* ลองตัวถัดไป */ }
+    }
+    if (!out) return res.status(502).json({ error: 'parse' });
     const items = Array.isArray(out.items) ? out.items.slice(0, 5) : [];
 
     return res.status(200).json({
