@@ -141,17 +141,18 @@
     <p class="hint">มีอะไรอยู่ในมือที่ใช้แข่งได้</p>
     <textarea id="kr" data-k="kr" placeholder="ทำเล · สูตร · ทีมกี่คน · ครัวรองรับกี่จานต่อชั่วโมง"></textarea></div>
 
-  <div class="f c-vp key"><div class="n">04</div><label for="vp">คุณค่าที่ส่งมอบ</label>
-    <p class="hint">ลูกค้าเลือกเราแทนร้านข้าง ๆ เพราะอะไร — ห้ามใช้คำว่าอร่อย สะอาด บริการดี</p>
-    <textarea id="vp" data-k="vp" placeholder="เขียนเป็นประโยคที่ลูกค้าจะพูดเอง เช่น อิ่มจริงในราคา 60 และได้ที่นั่งใน 5 นาที"></textarea></div>
+  <div class="f c-vp key"><div class="n">04</div><label>คุณค่าที่ส่งมอบ</label>
+    <p class="hint">แยกเขียนทีละกลุ่ม — แต่ละกลุ่มจ้างร้านเราไปทำงานคนละอย่าง คุณค่าจึงคนละชุด</p>
+    <div id="vpwrap"></div>
+    <textarea id="vp" data-k="vp" hidden></textarea></div>
 
   <div class="f c-cr"><div class="n">05</div><label for="cr">ความสัมพันธ์</label>
     <p class="hint">ทำยังไงให้เขากลับมาครั้งที่สอง</p>
-    <textarea id="cr" data-k="cr" placeholder="บัตรสะสม · LINE OA · จำหน้าจำชื่อ · ตอบรีวิวภายในกี่ชั่วโมง"></textarea></div>
+    <textarea id="cr" data-k="cr" placeholder="บัตรสะสม · LINE OA · จำหน้าจำชื่อ · ตอบรีวิวภายในกี่ชั่วโมง"></textarea><div class="segchips" data-for="cr"></div></div>
 
   <div class="f c-ch"><div class="n">06</div><label for="ch">ช่องทาง</label>
     <p class="hint">ลูกค้าเจอเราและซื้อได้ทางไหน ใส่สัดส่วนจริง</p>
-    <textarea id="ch" data-k="ch" placeholder="หน้าร้าน 70% · เดลิเวอรี 25% · จัดเลี้ยง 5%"></textarea></div>
+    <textarea id="ch" data-k="ch" placeholder="หน้าร้าน 70% · เดลิเวอรี 25% · จัดเลี้ยง 5%"></textarea><div class="segchips" data-for="ch"></div></div>
 
   <div class="f c-cs key"><div class="n">07</div><label for="cs">กลุ่มลูกค้า</label>
     <p class="hint">ใครคือคนจ่ายเงินจริง — คำว่าคนทั่วไปใช้ไม่ได้</p>
@@ -163,7 +164,7 @@
 
   <div class="f c-rs"><div class="n">09</div><label for="rs">รายได้</label>
     <p class="hint">เงินเข้าทางไหน ยอดต่อบิลเท่าไหร่</p>
-    <textarea id="rs" data-k="rs" placeholder="ขายหน้าร้าน · เดลิเวอรี · จัดเลี้ยง · ยอดต่อบิลเฉลี่ย กี่บิลต่อวัน"></textarea></div>
+    <textarea id="rs" data-k="rs" placeholder="ขายหน้าร้าน · เดลิเวอรี · จัดเลี้ยง · ยอดต่อบิลเฉลี่ย กี่บิลต่อวัน"></textarea><div class="segchips" data-for="rs"></div></div>
 </div>
   <div class="seg-actions noprint"><button class="mini" id="draftcs" type="button">ร่างช่องกลุ่มลูกค้าจากตารางข้างบน</button></div>
 </section>
@@ -197,6 +198,19 @@
   <div class="calc empty" id="calc"><p>กรอกค่าเช่า ค่าแรง และต้นทุนวัตถุดิบ แล้วจุดคุ้มทุนจะขึ้นตรงนี้</p></div>
 </section>
 
+
+<section class="step" id="step-strength">
+  <p class="step-n">ขั้นที่ 4</p>
+  <h2>โมเดลนี้แข็งแรงแค่ไหน</h2>
+  <p class="step-lede">
+    7 คำถามจาก Osterwalder &amp; Pigneur ผู้ออกแบบ Business Model Canvas
+    ใช้วัดว่าโมเดลทำงานแทนเราได้แค่ไหน ไม่ใช่วัดว่ากรอกครบมั้ย
+    ให้คะแนนตัวเองตามจริง ข้อละ 0–10
+  </p>
+  <div class="review" id="strength"></div>
+  <div class="calc empty" id="strscore"><p>ให้คะแนนแล้วผลจะขึ้นตรงนี้</p></div>
+</section>
+
 <section class="step" id="step-review">
   <p class="step-n">ผลตรวจ</p>
   <h2>Canvas นี้ยังขาดอะไร</h2>
@@ -224,8 +238,8 @@
 <script>
 (function(){
   var R = window.BMC_RULES;
-  var KEY = 'bmc-restaurant-v2';
-  var OLD = 'bmc-restaurant-v1';
+  var KEY = 'bmc-restaurant-v3';
+  var OLD = ['bmc-restaurant-v2','bmc-restaurant-v1'];
   var MAXSEG = 4;
 
   var fields = [].slice.call(document.querySelectorAll('[data-k]'));
@@ -233,7 +247,8 @@
   var shop   = document.getElementById('shop');
   var status = document.getElementById('status');
 
-  var state = { shop:'', blocks:{}, nums:{}, segs:[ blankSeg(), blankSeg() ] };
+  var state = { shop:'', blocks:{}, nums:{}, segs:[ blankSeg(), blankSeg() ],
+                vps:{}, tags:{}, str:{} };
   function blankSeg(){ return { name:'' }; }
 
   /* ---------- เก็บ/อ่าน ---------- */
@@ -242,16 +257,24 @@
     var raw = read(KEY);
     if (raw) { try { var d = JSON.parse(raw); if (d && d.blocks) state = d; } catch(e){} }
     else {
-      // ผู้ใช้เดิมที่กรอกไว้ก่อนมีตาราง STP ต้องไม่เสียของ
-      var old = read(OLD);
-      if (old) { try {
-        var o = JSON.parse(old);
-        state.shop = o.shop || '';
-        fields.forEach(function(f){ state.blocks[f.dataset.k] = o[f.dataset.k] || ''; });
-      } catch(e){} }
+      // ผู้ใช้เดิมต้องไม่เสียของเวลาเราเปลี่ยนโครงข้อมูล ไล่หาเวอร์ชันเก่าลงไปทีละชั้น
+      for (var i = 0; i < OLD.length; i++) {
+        var old = read(OLD[i]);
+        if (!old) continue;
+        try {
+          var o = JSON.parse(old);
+          state.shop = o.shop || '';
+          if (o.blocks) { state = Object.assign(state, o); }
+          else { fields.forEach(function(f){ state.blocks[f.dataset.k] = o[f.dataset.k] || ''; }); }
+        } catch(e){}
+        break;
+      }
     }
     if (!state.segs || !state.segs.length) state.segs = [ blankSeg(), blankSeg() ];
     if (!state.nums) state.nums = {};
+    if (!state.vps)  state.vps  = {};
+    if (!state.tags) state.tags = {};
+    if (!state.str)  state.str  = {};
     if (!state.blocks) state.blocks = {};
     shop.value = state.shop || '';
     fields.forEach(function(f){ f.value = state.blocks[f.dataset.k] || ''; });
@@ -327,7 +350,7 @@
     var t = e.target;
     if (!t.dataset || t.dataset.seg === undefined || !t.dataset.f) return;
     state.segs[+t.dataset.seg][t.dataset.f] = t.value;
-    if (t.dataset.f === 'name') drawTGT();
+    if (t.dataset.f === 'name') { drawTGT(); drawVP(); drawChips(); }
     save(); review();
   }
   document.getElementById('stp').addEventListener('input', onSegInput);
@@ -342,12 +365,12 @@
 
   document.getElementById('addseg').addEventListener('click', function(){
     if (state.segs.length >= MAXSEG) return;
-    state.segs.push(blankSeg()); drawSTP(); drawTGT(); save(); review();
+    state.segs.push(blankSeg()); drawSTP(); drawTGT(); drawVP(); drawChips(); save(); review();
   });
   document.getElementById('delseg').addEventListener('click', function(){
     if (state.segs.length <= 1) return;
     if (!confirm('ลบกลุ่มลูกค้ากลุ่มสุดท้าย พร้อมข้อมูลในคอลัมน์นั้น')) return;
-    state.segs.pop(); drawSTP(); drawTGT(); save(); review();
+    state.segs.pop(); drawSTP(); drawTGT(); drawVP(); drawChips(); save(); review();
   });
 
   document.getElementById('draftcs').addEventListener('click', function(){
@@ -364,6 +387,114 @@
     if (cs.value.trim() && !confirm('ช่องกลุ่มลูกค้ามีข้อความอยู่แล้ว ต้องการเขียนทับ')) return;
     cs.value = lines.join('\n');
     save(); review();
+  });
+
+
+  /* ---------- สีประจำกลุ่ม + ผูกช่องฝั่งขวาเข้ากับกลุ่ม ---------- */
+  function segColor(i){ return R.SEG_COLORS[i % R.SEG_COLORS.length]; }
+  function segLabel(i){ return segColor(i).key + (state.segs[i] && state.segs[i].name ? ' · ' + state.segs[i].name : ''); }
+  function activeSegs(){
+    // นับเฉพาะกลุ่มที่มีข้อมูลจริง ไม่งั้นคอลัมน์ว่างจะไปโผล่เป็นชิปให้กดสับสน
+    return state.segs.map(function(sg, i){ return i; }).filter(function(i){
+      var sg = state.segs[i];
+      return (sg.name || '').trim() ||
+             R.STP.some(function(g){ return g.rows.some(function(r){ return (sg[r.key] || '').trim(); }); });
+    });
+  }
+
+  function drawVP(){
+    var wrap = document.getElementById('vpwrap');
+    var idx = activeSegs();
+    if (!idx.length) idx = [0];
+    wrap.innerHTML = idx.map(function(i){
+      var c = segColor(i);
+      return '<div class="vpseg"><span class="lab" style="background:' + c.color + '">' + esc(segLabel(i)) + '</span>'
+           + '<textarea data-vp="' + i + '" placeholder="กลุ่มนี้จ้างร้านเราไปทำงานอะไร แล้วเราปิดงานนั้นยังไง">'
+           + esc(state.vps[i] || '') + '</textarea></div>';
+    }).join('');
+    syncVP();
+  }
+  // ช่อง vp ตัวจริงยังต้องมีข้อความรวม เพราะกฎตรวจและการพิมพ์อ่านจากช่องนี้
+  function syncVP(){
+    var idx = activeSegs(); if (!idx.length) idx = [0];
+    document.getElementById('vp').value = idx.map(function(i){
+      return state.vps[i] ? segLabel(i) + ': ' + state.vps[i] : '';
+    }).filter(Boolean).join('\n');
+  }
+
+  function drawChips(){
+    var idx = activeSegs();
+    [].slice.call(document.querySelectorAll('.segchips')).forEach(function(box){
+      var k = box.dataset.for, tags = state.tags[k] || [];
+      if (idx.length < 2) { box.innerHTML = ''; return; }   // มีกลุ่มเดียวไม่ต้องเลือก
+      var all = idx.every(function(i){ return tags.indexOf(i) >= 0; });
+      box.innerHTML = '<span style="font-size:11.5px;color:var(--ink-mute);align-self:center">ตอบกลุ่ม:</span>'
+        + idx.map(function(i){
+            var c = segColor(i), on = tags.indexOf(i) >= 0;
+            return '<button type="button" class="chip' + (on ? ' on' : '') + '" data-k="' + k + '" data-i="' + i + '"'
+                 + (on ? ' style="background:' + c.color + ';border-color:' + c.color + '"' : '')
+                 + '>' + esc(segLabel(i)) + '</button>';
+          }).join('')
+        + '<button type="button" class="chip all' + (all ? ' on' : '') + '" data-k="' + k + '" data-i="all">ทุกกลุ่ม</button>';
+    });
+  }
+
+  document.addEventListener('click', function(e){
+    var b = e.target.closest && e.target.closest('.chip[data-k]');
+    if (!b) return;
+    var k = b.dataset.k, idx = activeSegs();
+    var tags = (state.tags[k] || []).slice();
+    if (b.dataset.i === 'all') {
+      tags = idx.every(function(i){ return tags.indexOf(i) >= 0; }) ? [] : idx.slice();
+    } else {
+      var i = +b.dataset.i, at = tags.indexOf(i);
+      if (at >= 0) tags.splice(at, 1); else tags.push(i);
+    }
+    state.tags[k] = tags;
+    drawChips(); save(); review();
+  });
+
+  document.getElementById('vpwrap').addEventListener('input', function(e){
+    if (e.target.dataset.vp === undefined) return;
+    state.vps[+e.target.dataset.vp] = e.target.value;
+    syncVP(); save(); review();
+  });
+
+  /* ---------- คะแนนความแข็งแรง 7 ข้อ ---------- */
+  function drawStrength(){
+    document.getElementById('strength').innerHTML = R.STRENGTH.map(function(q){
+      var v = state.str[q.key];
+      v = (v === undefined || v === '') ? '' : v;
+      return '<div class="sq"><h4>' + esc(q.label) + '</h4><p>' + esc(q.hint) + '</p>'
+           + '<div class="row"><input type="range" min="0" max="10" step="1" value="' + (v === '' ? 0 : v) + '" data-s="' + q.key + '">'
+           + '<span class="val" id="sv-' + q.key + '">' + (v === '' ? '–' : v) + '</span></div></div>';
+    }).join('');
+  }
+  function scoreStrength(){
+    var box = document.getElementById('strscore');
+    var keys = R.STRENGTH.map(function(q){ return q.key; });
+    var done = keys.filter(function(k){ return state.str[k] !== undefined && state.str[k] !== ''; });
+    if (!done.length) {
+      box.className = 'calc empty';
+      box.innerHTML = '<p>ให้คะแนนแล้วผลจะขึ้นตรงนี้</p>';
+      return null;
+    }
+    var total = keys.reduce(function(a, k){ return a + (parseInt(state.str[k]) || 0); }, 0);
+    var band = R.STRENGTH_READ.filter(function(b){ return total >= b.min && total <= b.max; })[0] || R.STRENGTH_READ[0];
+    var weak = R.STRENGTH.filter(function(q){ return (parseInt(state.str[q.key]) || 0) <= 3; });
+    box.className = 'calc';
+    box.innerHTML = '<p class="big">' + total + ' / 70 · ' + band.t + '</p><p>' + band.p + '</p>'
+      + (weak.length ? '<div class="bm"><div class="bm-row"><span class="nm">ข้อที่อ่อนที่สุด</span><span>'
+          + weak.map(function(q){ return esc(q.label); }).join(' · ') + '</span></div></div>' : '')
+      + (done.length < keys.length ? '<div class="bm"><div class="bm-row" style="opacity:.75"><span>ยังไม่ได้ให้คะแนน '
+          + (keys.length - done.length) + ' ข้อ คะแนนรวมจึงยังไม่ครบ</span></div></div>' : '');
+    return { total:total, weak:weak };
+  }
+  document.getElementById('strength').addEventListener('input', function(e){
+    var k = e.target.dataset.s; if (!k) return;
+    state.str[k] = e.target.value;
+    document.getElementById('sv-' + k).textContent = e.target.value;
+    scoreStrength(); save(); review();
   });
 
   /* ---------- ตัวเลข: จุดคุ้มทุน + เทียบเกณฑ์ ---------- */
@@ -423,6 +554,8 @@
   }
 
   /* ---------- ผลตรวจ ---------- */
+  var BLOCK_NAME = { vp:'คุณค่าที่ส่งมอบ', cs:'กลุ่มลูกค้า', ch:'ช่องทาง', cr:'ความสัมพันธ์',
+                     rs:'รายได้', kr:'ทรัพยากรหลัก', ka:'กิจกรรมหลัก', kp:'พันธมิตรหลัก', co:'โครงสร้างต้นทุน' };
   function review(){
     var d = {};
     fields.forEach(function(f){ d[f.dataset.k] = f.value || ''; });
@@ -433,11 +566,11 @@
     if (empty.length)
       out.push({ k:'ยังว่าง', t:'ยังไม่ได้กรอก ' + empty.length + ' ช่อง',
                  p:'ช่องที่เหลือ: ' + empty.map(function(f){
-                     return document.querySelector('label[for="'+f.id+'"]').textContent; }).join(' · ') });
+                     var lb = document.querySelector('label[for="' + f.id + '"]');
+                     return lb ? lb.textContent : (BLOCK_NAME[f.id] || f.id); }).join(' · ') });
 
     // ตาราง STP
-    var filled = state.segs.filter(function(sg){
-      return R.STP.some(function(g){ return g.rows.some(function(r){ return (sg[r.key]||'').trim(); }); }); });
+    var filled = activeSegs();
     if (!filled.length)
       out.push({ k:'ขั้นที่ 1', t:'ยังไม่ได้กรอกตารางกลุ่มลูกค้า',
                  p:'สไลด์บอกว่าต้องเริ่มจากลูกค้าก่อนเสมอ ไม่ใช่เริ่มจาก "อยากเปิดร้าน" — เริ่มจากไอเดียคือ Market Risk เต็ม ๆ' });
@@ -471,6 +604,38 @@
       if (ok) out.push({ bad:true, k:'ช่องขัดกัน', t:c.msg, p:c.fix });
     });
 
+    // แต่ละกลุ่มลูกค้าได้รับคำตอบครบทุกช่องฝั่งขวามั้ย
+    // Value Proposition Design เรียกความสอดคล้องนี้ว่า fit
+    // ถ้ากลุ่มไหนไม่มีคุณค่า ช่องทาง ความสัมพันธ์ หรือรายได้ แปลว่าเขียนกลุ่มนั้นไว้เฉย ๆ
+    var act = activeSegs();
+    var NAMES = { vp:'คุณค่า', ch:'ช่องทาง', cr:'ความสัมพันธ์', rs:'รายได้' };
+    if (act.length >= 1) {
+      act.forEach(function(i){
+        var miss = [];
+        if (!(state.vps[i] || '').trim()) miss.push(NAMES.vp);
+        if (act.length >= 2) ['ch','cr','rs'].forEach(function(k){
+          if (!d[k].trim()) return;                       // ช่องยังว่าง เตือนไปแล้วข้างบน
+          if ((state.tags[k] || []).indexOf(i) < 0) miss.push(NAMES[k]);
+        });
+        if (miss.length)
+          out.push({ bad:true, k:segColor(i).key, t:'กลุ่ม ' + segLabel(i) + ' ยังไม่มี ' + miss.join(' · '),
+                     p:'เขียนกลุ่มลูกค้าไว้แล้วแต่ยังไม่มีคำตอบว่าจะส่งคุณค่าอะไรให้เขา หรือส่งถึงเขายังไง — กลุ่มที่ไม่มีคำตอบครบ คือกลุ่มที่ยังไม่ได้ตัดสินใจว่าจะทำจริงมั้ย' });
+      });
+      // ตรงข้ามกัน: ช่องที่ตอบทุกกลุ่มเหมือนกันหมด
+      if (act.length >= 2) ['ch','cr','rs'].forEach(function(k){
+        var tg = state.tags[k] || [];
+        if (d[k].trim() && tg.length === act.length && d[k].length < 60)
+          out.push({ k:'ทุกกลุ่ม', t:'ช่อง' + NAMES[k] + 'ตอบทุกกลุ่มด้วยคำตอบเดียว',
+                     p:'ไม่ผิดถ้าใช้ร่วมกันได้จริง แต่ลองเช็คว่าแต่ละกลุ่มเจอเราคนละทางมั้ย เช่นกลุ่มเช้ามาหน้าร้าน กลุ่มบ่ายสั่งเดลิเวอรี ถ้าคนละทางควรแยกเขียน' });
+      });
+    }
+
+    // ความแข็งแรงของโมเดล
+    var st = scoreStrength();
+    if (st && st.weak.length)
+      out.push({ bad:true, k:'ความแข็งแรง', t:'มี ' + st.weak.length + ' ข้อที่ให้คะแนนตัวเอง 3 หรือต่ำกว่า',
+                 p:'ข้อที่อ่อนที่สุด: <b>' + st.weak.map(function(q){ return esc(q.label); }).join(' · ') + '</b> — ข้อพวกนี้คือจุดที่โมเดลต้องพึ่งแรงเราทุกวัน แทนที่จะทำงานเอง' });
+
     // ตัวเลข
     var n = calc();
     if (n && n.prime > R.PRIME_COST_MAX)
@@ -501,15 +666,15 @@
 
   document.getElementById('clear').addEventListener('click', function(){
     if (!confirm('ล้างข้อมูลทั้งหมดในหน้านี้ ทำแล้วย้อนกลับไม่ได้')) return;
-    state = { shop:'', blocks:{}, nums:{}, segs:[ blankSeg(), blankSeg() ] };
+    state = { shop:'', blocks:{}, nums:{}, segs:[ blankSeg(), blankSeg() ], vps:{}, tags:{}, str:{} };
     shop.value = '';
     fields.forEach(function(f){ f.value = ''; });
     nums.forEach(function(f){ f.value = ''; });
-    try { localStorage.removeItem(KEY); localStorage.removeItem(OLD); } catch(e){}
-    drawSTP(); drawTGT(); save(); review();
+    try { localStorage.removeItem(KEY); OLD.forEach(function(k){ localStorage.removeItem(k); }); } catch(e){}
+    drawSTP(); drawTGT(); drawVP(); drawChips(); drawStrength(); scoreStrength(); save(); review();
   });
 
-  load(); drawSTP(); drawTGT(); save(); review();
+  load(); drawSTP(); drawTGT(); drawVP(); drawChips(); drawStrength(); scoreStrength(); save(); review();
 })();
 </script>
 

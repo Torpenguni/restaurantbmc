@@ -243,3 +243,50 @@ table.stp thead th input:focus{background:rgba(255,255,255,.15)}
   .mini,.seg-actions,.stars button{display:none}
   .review,.calc{break-inside:avoid}
 }
+
+/* ============================================================
+   ผูกช่องฝั่งขวาเข้ากับกลุ่มลูกค้า
+
+   ฝั่งขวาของ canvas (คุณค่า ช่องทาง ความสัมพันธ์ รายได้) ต้องตอบว่า
+   ทำให้ "กลุ่มไหน" ส่วนฝั่งซ้ายเป็นโครงสร้างที่ใช้ร่วมกันทั้งร้าน
+   ทุกที่ที่ใช้สี จะมีตัวอักษร A B C D กำกับเสมอ ไม่ใช้สีอย่างเดียว
+   เพราะผู้ชายราว 8% แยกสีบางคู่ไม่ออก
+   ============================================================ */
+.segchips{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.chip{
+  font:inherit;font-size:12px;font-weight:700;cursor:pointer;
+  border:1.5px solid var(--rule-soft);background:transparent;color:var(--ink-mute);
+  border-radius:999px;padding:3px 10px;line-height:1.5;
+}
+.chip:hover{border-color:var(--rule)}
+.chip.on{color:#fff}
+.chip.on.all{background:#141410;border-color:#141410}
+.chip:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+
+.vpseg{margin-bottom:9px}
+.vpseg:last-child{margin-bottom:0}
+.vpseg .lab{
+  display:inline-block;font-size:11.5px;font-weight:700;color:#fff;
+  border-radius:3px;padding:1px 7px;margin-bottom:3px;
+}
+.vpseg textarea{
+  width:100%;min-height:58px;resize:vertical;font:inherit;font-size:14px;
+  line-height:1.6;padding:8px 9px;border-radius:4px;color:var(--ink);
+  border:1px dashed var(--rule-soft);background:rgba(255,255,255,.55);
+}
+.vpseg textarea:focus{outline:none;border-style:solid;background:#fff}
+
+/* แผงคะแนนความแข็งแรง */
+.sq{padding:15px 18px;border-bottom:1px solid var(--rule-soft)}
+.sq:last-child{border-bottom:0}
+.sq h4{margin:0 0 3px;font-size:15.5px;font-weight:700;line-height:1.45}
+.sq p{margin:0 0 9px;font-size:13.5px;color:var(--ink-mute);line-height:1.6;max-width:none}
+.sq .row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.sq input[type=range]{flex:1 1 220px;accent-color:var(--note-deep);margin:0}
+.sq .val{font-size:19px;font-weight:700;min-width:2.4em;font-variant-numeric:tabular-nums}
+
+@media print{
+  .chip{border-color:#000;color:#000}
+  .chip.on{color:#fff}
+  .sq input[type=range]{display:none}
+}
