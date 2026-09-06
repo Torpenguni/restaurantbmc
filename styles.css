@@ -319,3 +319,69 @@ table.stp thead th input:focus{background:rgba(255,255,255,.15)}
 .rv.ai-item .tag{background:#dbe7f5}
 .rv.ai-item.warn-x .tag{background:#ffd0c9}
 @media print{ .ai .row{display:none} }
+
+/* ============================================================
+   กล่องยืนยันในหน้า แทน confirm() ของเบราว์เซอร์
+
+   confirm() หยุดทั้งหน้าและหน้าตาเป็นของระบบปฏิบัติการ คนกรอกครั้งแรก
+   อ่านแล้วนึกว่าเว็บค้าง เลยไม่กล้ากดต่อ ใช้ <dialog> แทนเพราะได้
+   ทั้งโฟกัสที่ถูกต้อง ปิดด้วย Esc และจัดหน้าตาเองได้
+   ============================================================ */
+dialog.ask{
+  border:2px solid var(--rule);background:var(--paper-2);color:var(--ink);
+  padding:0;max-width:min(460px,calc(100vw - 32px));width:100%;
+  font-family:inherit;
+}
+dialog.ask::backdrop{background:rgba(20,20,16,.55)}
+dialog.ask .hd{padding:20px 22px 0}
+dialog.ask h3{margin:0 0 8px;font-size:19px;line-height:1.4}
+dialog.ask p{margin:0 0 4px;font-size:15px;line-height:1.7;color:var(--ink-mute);max-width:none}
+dialog.ask .ft{display:flex;gap:10px;justify-content:flex-end;padding:18px 22px 20px;flex-wrap:wrap}
+dialog.ask .btn{padding:11px 18px;font-size:15px}
+dialog.ask .danger{background:#a1231b;border-color:#a1231b;color:#fff}
+dialog.ask .danger:hover{background:#7f1a14;border-color:#7f1a14}
+
+/* ---------- แถบบอกขั้นตอน ---------- */
+.stepper{
+  position:sticky;top:62px;z-index:45;background:var(--paper);
+  border-bottom:2px solid var(--rule);padding:10px 0;
+}
+.stepper .wrap{display:flex;gap:8px;overflow-x:auto;align-items:center}
+.stepper a{
+  flex:0 0 auto;text-decoration:none;color:var(--ink-mute);font-size:13.5px;font-weight:600;
+  border:1.5px solid var(--rule-soft);border-radius:999px;padding:6px 13px;white-space:nowrap;
+}
+.stepper a:hover{border-color:var(--rule);color:var(--ink)}
+.stepper a .tick{color:var(--green);font-weight:700}
+.stepper a.done{border-color:var(--green);color:var(--ink)}
+.stepper a.now{background:var(--note);border-color:var(--note-deep);color:var(--ink)}
+
+/* ---------- ปุ่มกำลังทำงาน ---------- */
+.btn[aria-busy="true"]{opacity:.7;cursor:progress}
+.spin{
+  display:inline-block;width:13px;height:13px;border:2px solid currentColor;
+  border-right-color:transparent;border-radius:50%;animation:sp .7s linear infinite;
+}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){ .spin{animation:none} }
+
+/* ---------- บอกว่าตารางเลื่อนได้ ---------- */
+.tw{position:relative}
+.tw::after{
+  content:'';position:absolute;top:0;right:0;bottom:0;width:26px;pointer-events:none;
+  background:linear-gradient(to right,rgba(250,249,245,0),rgba(20,20,16,.13));
+}
+.tw.ended::after{opacity:0}
+.scrollhint{
+  font-size:12.5px;color:var(--ink-mute);margin:6px 0 0;display:none;
+}
+@media (max-width:760px){ .scrollhint{display:block} }
+
+/* ---------- คำอธิบายชิป / ดาว ---------- */
+.hintline{font-size:12.5px;color:var(--ink-mute);margin:6px 0 0;line-height:1.55}
+.segchips .why{font-size:11.5px;color:var(--ink-mute);flex:1 1 100%;margin:0 0 1px}
+table.stp td.tot{padding:9px 11px;font-weight:700;font-variant-numeric:tabular-nums}
+
+/* ---------- ศัพท์ที่ต้องอธิบาย ---------- */
+abbr[title]{text-decoration:underline dotted;text-underline-offset:3px;cursor:help}
+@media print{ .stepper,dialog.ask{display:none} }

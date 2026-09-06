@@ -92,6 +92,20 @@
   </div>
 </header>
 
+<nav class="stepper noprint" aria-label="ขั้นตอน">
+  <div class="wrap" id="stepper"></div>
+</nav>
+
+<dialog class="ask" id="ask">
+  <form method="dialog">
+    <div class="hd"><h3 id="ask-t"></h3><p id="ask-b"></p></div>
+    <div class="ft">
+      <button class="btn btn-plain" value="no" type="submit">ยกเลิก</button>
+      <button class="btn btn-solid" value="yes" type="submit" id="ask-ok">ยืนยัน</button>
+    </div>
+  </form>
+</dialog>
+
 <div class="wrap">
 
 <section class="tool-head">
@@ -115,17 +129,19 @@
     กรอกให้เจาะจงจนนึกภาพคนคนนั้นออก แล้วค่อยเอาไปสรุปลงตาราง Canvas ข้างล่าง
   </p>
   <div class="tw"><table class="stp" id="stp"></table></div>
+  <p class="scrollhint">← เลื่อนตารางซ้ายขวาเพื่อดูกลุ่มอื่น</p>
   <div class="seg-actions noprint">
     <button class="mini" id="addseg" type="button">+ เพิ่มกลุ่มลูกค้า</button>
     <button class="mini" id="delseg" type="button">− ลบกลุ่มสุดท้าย</button>
   </div>
 
   <h3 style="margin:30px 0 6px">แล้วกลุ่มไหนควรเป็นกลุ่มหลัก</h3>
-  <p class="step-lede">ให้ดาว 1–5 ตามเกณฑ์ กลุ่มที่ได้ดาวรวมสูงสุดจะถูกไฮไลต์เป็นกลุ่มหลัก</p>
+  <p class="step-lede">ให้ดาว 1–5 ตามเกณฑ์ กลุ่มที่ได้ดาวรวมสูงสุดจะถูกไฮไลต์เป็นกลุ่มหลัก <span class="hintline" style="display:inline">· กดดาวดวงเดิมซ้ำเพื่อล้างคะแนนข้อนั้น</span></p>
   <div class="tw"><table class="stp" id="tgt"></table></div>
+  <p class="scrollhint">← เลื่อนตารางซ้ายขวาเพื่อดูกลุ่มอื่น</p>
 </section>
 
-<section class="step">
+<section class="step" id="step-canvas">
   <p class="step-n">ขั้นที่ 2</p>
   <h2>Canvas ทั้ง 9 ช่อง</h2>
   <p class="step-lede">ช่องกลุ่มลูกค้าให้เขียนสรุปสั้น ๆ จากตารางข้างบน — กดปุ่มด้านล่างให้ร่างให้ก่อนก็ได้</p>
@@ -156,8 +172,9 @@
     <textarea id="ch" data-k="ch" placeholder="หน้าร้าน 70% · เดลิเวอรี 25% · จัดเลี้ยง 5%"></textarea><div class="segchips" data-for="ch"></div></div>
 
   <div class="f c-cs key"><div class="n">07</div><label for="cs">กลุ่มลูกค้า</label>
-    <p class="hint">ใครคือคนจ่ายเงินจริง — คำว่าคนทั่วไปใช้ไม่ได้</p>
-    <textarea id="cs" data-k="cs" placeholder="มาช่วงไหน มาคนเดียวหรือมากลุ่ม จ่ายต่อหัวเท่าไหร่ ถ้ามีหลายกลุ่มให้แยกเขียน"></textarea></div>
+    <p class="hint">สรุปสั้น ๆ จากตารางในขั้นที่ 1 — ไม่ต้องกรอกซ้ำทั้งหมด</p>
+    <button class="mini noprint" id="draftcs" type="button" style="margin-bottom:8px;font-size:12.5px;padding:5px 11px">ร่างให้จากตารางขั้นที่ 1</button>
+    <textarea id="cs" data-k="cs" placeholder="กดปุ่มข้างบนให้ร่างให้ หรือเขียนเองก็ได้"></textarea></div>
 
   <div class="f c-co"><div class="n">08</div><label for="co">โครงสร้างต้นทุน</label>
     <p class="hint">เงินออกทางไหน แยกคงที่กับผันแปร</p>
@@ -167,7 +184,6 @@
     <p class="hint">เงินเข้าทางไหน ยอดต่อบิลเท่าไหร่</p>
     <textarea id="rs" data-k="rs" placeholder="ขายหน้าร้าน · เดลิเวอรี · จัดเลี้ยง · ยอดต่อบิลเฉลี่ย กี่บิลต่อวัน"></textarea><div class="segchips" data-for="rs"></div></div>
 </div>
-  <div class="seg-actions noprint"><button class="mini" id="draftcs" type="button">ร่างช่องกลุ่มลูกค้าจากตารางข้างบน</button></div>
 </section>
 
 
@@ -175,7 +191,7 @@
   <p class="step-n">ขั้นที่ 3</p>
   <h2>ตัวเลข — โมเดลนี้เลี้ยงตัวเองได้มั้ย</h2>
   <p class="step-lede">
-    ช่องต้นทุนคือช่องที่พิสูจน์ว่าโมเดลเวิร์คจริง กรอกเท่าที่รู้ ระบบจะคำนวณจุดคุ้มทุนให้
+    ช่องต้นทุนคือช่องที่พิสูจน์ว่าโมเดลนี้ไปได้จริงมั้ย กรอกเท่าที่รู้ ระบบจะคำนวณจุดคุ้มทุนให้
     แล้วเทียบกับช่วงมาตรฐานของธุรกิจร้านอาหารว่าช่องไหนเกิน
   </p>
   <div class="nums">
@@ -183,15 +199,15 @@
       <input id="n-rent" data-n="rent" type="number" min="0" inputmode="numeric" placeholder="30000"></div>
     <div class="nf"><label for="n-staff">ค่าแรงพนักงาน</label><span class="u">บาท/เดือน รวมทุกคน</span>
       <input id="n-staff" data-n="staff" type="number" min="0" inputmode="numeric" placeholder="36000"></div>
-    <div class="nf"><label for="n-fix">ต้นทุนคงที่อื่น</label><span class="u">บาท/เดือน — น้ำ ไฟ บัญชี POS</span>
+    <div class="nf"><label for="n-fix">ต้นทุนคงที่อื่น ๆ</label><span class="u">บาท/เดือน — ค่าที่จ่ายเท่าเดิมทุกเดือน เช่น น้ำ ไฟ บัญชี</span>
       <input id="n-fix" data-n="fix" type="number" min="0" inputmode="numeric" placeholder="25000"></div>
     <div class="nf"><label for="n-cogs">ต้นทุนวัตถุดิบ</label><span class="u">% ของยอดขาย</span>
       <input id="n-cogs" data-n="cogs" type="number" min="0" max="100" step="0.1" inputmode="decimal" placeholder="35"></div>
-    <div class="nf"><label for="n-gp">GP เดลิเวอรี</label><span class="u">% ของยอดขาย — ไม่มีใส่ 0</span>
+    <div class="nf"><label for="n-gp">ค่าหักแพลตฟอร์มเดลิเวอรี</label><span class="u">% ของยอดขาย — ที่แอปหักไป ไม่มีใส่ 0</span>
       <input id="n-gp" data-n="gp" type="number" min="0" max="100" step="0.1" inputmode="decimal" placeholder="0"></div>
-    <div class="nf"><label for="n-var">ผันแปรอื่น</label><span class="u">% — เซอร์วิสชาร์จ การตลาด</span>
+    <div class="nf"><label for="n-var">ต้นทุนผันแปรอื่น ๆ</label><span class="u">% — ค่าที่ขึ้นลงตามยอดขาย เช่น เซอร์วิสชาร์จ ค่าการตลาด</span>
       <input id="n-var" data-n="var" type="number" min="0" max="100" step="0.1" inputmode="decimal" placeholder="7"></div>
-    <div class="nf"><label for="n-ta">ยอดขายเฉลี่ยต่อหัว</label><span class="u">บาท</span>
+    <div class="nf"><label for="n-ta">ยอดขายเฉลี่ยต่อคน</label><span class="u">บาท — ลูกค้าหนึ่งคนจ่ายเฉลี่ยเท่าไหร่</span>
       <input id="n-ta" data-n="ta" type="number" min="0" inputmode="numeric" placeholder="120"></div>
     <div class="nf"><label for="n-rev">ยอดขายที่คาดไว้</label><span class="u">บาท/เดือน — ไม่ใส่ก็ได้</span>
       <input id="n-rev" data-n="rev" type="number" min="0" inputmode="numeric" placeholder="400000"></div>
@@ -332,6 +348,7 @@
       });
     });
     document.getElementById('stp').innerHTML = h + '</tbody>';
+    watchScroll();
     document.getElementById('addseg').disabled = state.segs.length >= MAXSEG;
     document.getElementById('delseg').disabled = state.segs.length <= 1;
   }
@@ -353,16 +370,18 @@
         h += '<td><div class="stars">';
         for (var n = 1; n <= 5; n++)
           h += '<button type="button" data-seg="'+i+'" data-t="'+c.key+'" data-v="'+n+'" class="'+(n<=v?'on':'')+'" aria-label="'+n+' ดาว">★</button>';
-        h += '</div></td>';
+        h += '<span style="margin-left:6px;font-size:13px;font-weight:700;color:var(--ink-mute);font-variant-numeric:tabular-nums">'
+           + (v ? v + '/5' : '–') + '</span></div></td>';
       });
       h += '</tr>';
     });
     h += '<tr><th>รวม</th>';
     totals.forEach(function(t){
-      h += '<td class="'+(t && t === best ? 'win' : '')+'" style="padding:9px 11px;font-weight:700">'
-         + (t || '–') + (t && t === best ? ' · กลุ่มหลัก' : '') + '</td>';
+      h += '<td class="tot '+(t && t === best ? 'win' : '')+'">'
+         + (t ? t + '/25' : '–') + (t && t === best ? ' · กลุ่มหลัก' : '') + '</td>';
     });
     document.getElementById('tgt').innerHTML = h + '</tr></tbody>';
+    watchScroll();
   }
 
   function onSegInput(e){
@@ -386,13 +405,17 @@
     if (state.segs.length >= MAXSEG) return;
     state.segs.push(blankSeg()); drawSTP(); drawTGT(); drawVP(); drawChips(); save(); review();
   });
-  document.getElementById('delseg').addEventListener('click', function(){
+  document.getElementById('delseg').addEventListener('click', async function(){
     if (state.segs.length <= 1) return;
-    if (!confirm('ลบกลุ่มลูกค้ากลุ่มสุดท้าย พร้อมข้อมูลในคอลัมน์นั้น')) return;
+    var last = state.segs[state.segs.length - 1];
+    if (!await ask('ลบกลุ่มลูกค้ากลุ่มสุดท้าย',
+        'ข้อมูลทั้งคอลัมน์ของ "' + (last.name || 'กลุ่มที่ ' + state.segs.length) +
+        '" จะหายไป รวมถึงคุณค่าและดาวที่ให้ไว้ ทำแล้วย้อนกลับไม่ได้',
+        'ลบกลุ่มนี้', true)) return;
     state.segs.pop(); drawSTP(); drawTGT(); drawVP(); drawChips(); save(); review();
   });
 
-  document.getElementById('draftcs').addEventListener('click', function(){
+  document.getElementById('draftcs').addEventListener('click', async function(){
     var lines = state.segs.map(function(sg, i){
       var bits = [];
       R.STP.forEach(function(g){ g.rows.forEach(function(r){
@@ -401,13 +424,68 @@
       if (!bits.length) return '';
       return (sg.name || ('กลุ่มที่ ' + (i+1))) + ': ' + bits.join(' · ');
     }).filter(Boolean);
-    if (!lines.length) { alert('ยังไม่มีข้อมูลในตาราง STP ให้ร่าง'); return; }
+    if (!lines.length) {
+      ask('ยังไม่มีอะไรให้ร่าง', 'ตารางในขั้นที่ 1 ยังว่างอยู่ กรอกอย่างน้อยหนึ่งช่องก่อน', 'เข้าใจแล้ว');
+      return;
+    }
     var cs = document.getElementById('cs');
-    if (cs.value.trim() && !confirm('ช่องกลุ่มลูกค้ามีข้อความอยู่แล้ว ต้องการเขียนทับ')) return;
+    if (cs.value.trim() && !await ask('ช่องนี้มีข้อความอยู่แล้ว',
+        'การร่างใหม่จะเขียนทับข้อความเดิมทั้งหมด', 'เขียนทับ', true)) return;
     cs.value = lines.join('\n');
     save(); review();
   });
 
+
+
+  /* ---------- กล่องยืนยันในหน้า ----------
+     confirm() ของเบราว์เซอร์หยุดทั้งหน้าและหน้าตาเป็นของระบบปฏิบัติการ
+     คนกรอกครั้งแรกอ่านแล้วนึกว่าเว็บค้าง ใช้ <dialog> แทน */
+  var dlg = document.getElementById('ask');
+  function ask(title, body, okLabel, danger){
+    return new Promise(function(resolve){
+      document.getElementById('ask-t').textContent = title;
+      document.getElementById('ask-b').textContent = body;
+      var ok = document.getElementById('ask-ok');
+      ok.textContent = okLabel || 'ยืนยัน';
+      ok.className = 'btn ' + (danger ? 'btn-solid danger' : 'btn-solid');
+      function done(){ dlg.removeEventListener('close', done); resolve(dlg.returnValue === 'yes'); }
+      dlg.addEventListener('close', done);
+      dlg.returnValue = 'no';
+      if (dlg.showModal) dlg.showModal(); else resolve(window.confirm(title + '\n\n' + body));
+    });
+  }
+
+  /* ---------- แถบขั้นตอน ---------- */
+  var STEPS = [
+    { id:'step-cs',       n:'1', t:'กลุ่มลูกค้า' },
+    { id:'step-canvas',   n:'2', t:'Canvas 9 ช่อง' },
+    { id:'step-nums',     n:'3', t:'ตัวเลข' },
+    { id:'step-strength', n:'4', t:'ความแข็งแรง' },
+    { id:'step-review',   n:'',  t:'ผลตรวจ' }
+  ];
+  function progress(){
+    var seg = activeSegs().length;
+    var blocks = fields.filter(function(f){ return f.value.trim(); }).length;
+    var numsOk = ['rent','staff','cogs'].every(function(k){ return state.nums[k]; });
+    var scored = R.STRENGTH.filter(function(q){ return state.str[q.key] !== undefined && state.str[q.key] !== ''; }).length;
+    return {
+      'step-cs':       { done: seg >= 1,        label: seg ? seg + ' กลุ่ม' : '' },
+      'step-canvas':   { done: blocks === 9,    label: blocks + '/9' },
+      'step-nums':     { done: numsOk,          label: numsOk ? 'ครบ' : '' },
+      'step-strength': { done: scored === 7,    label: scored ? scored + '/7' : '' },
+      'step-review':   { done: false,           label: '' }
+    };
+  }
+  function drawStepper(){
+    var p = progress();
+    document.getElementById('stepper').innerHTML = STEPS.map(function(s){
+      var st = p[s.id], cls = st.done ? ' class="done"' : '';
+      return '<a href="#' + s.id + '"' + cls + '>'
+           + (st.done ? '<span class="tick">✓</span> ' : (s.n ? s.n + ' · ' : ''))
+           + esc(s.t) + (st.label ? ' <span style="opacity:.6">' + esc(st.label) + '</span>' : '')
+           + '</a>';
+    }).join('');
+  }
 
   /* ---------- สีประจำกลุ่ม + ผูกช่องฝั่งขวาเข้ากับกลุ่ม ---------- */
   function segColor(i){ return R.SEG_COLORS[i % R.SEG_COLORS.length]; }
@@ -447,7 +525,8 @@
       var k = box.dataset.for, tags = state.tags[k] || [];
       if (idx.length < 2) { box.innerHTML = ''; return; }   // มีกลุ่มเดียวไม่ต้องเลือก
       var all = idx.every(function(i){ return tags.indexOf(i) >= 0; });
-      box.innerHTML = '<span style="font-size:11.5px;color:var(--ink-mute);align-self:center">ตอบกลุ่ม:</span>'
+      box.innerHTML = '<p class="why">เลือกว่าช่องนี้ตอบลูกค้ากลุ่มไหน — ถ้ามีกลุ่มไหนตกหล่น ผลตรวจล่างสุดจะเตือนให้</p>'
+        + '<span style="font-size:11.5px;color:var(--ink-mute);align-self:center">ตอบกลุ่ม:</span>'
         + idx.map(function(i){
             var c = segColor(i), on = tags.indexOf(i) >= 0;
             return '<button type="button" class="chip' + (on ? ' on' : '') + '" data-k="' + k + '" data-i="' + i + '"'
@@ -478,6 +557,19 @@
     state.vps[+e.target.dataset.vp] = e.target.value;
     syncVP(); save(); review();
   });
+
+
+  /* ตารางกว้างกว่าจอ ต้องบอกให้รู้ว่าเลื่อนได้ และเอาเงาออกเมื่อสุดขอบ */
+  function watchScroll(){
+    [].slice.call(document.querySelectorAll('.tw')).forEach(function(w){
+      if (w._w) return; w._w = 1;
+      function upd(){
+        var end = w.scrollLeft + w.clientWidth >= w.scrollWidth - 2;
+        w.classList.toggle('ended', end || w.scrollWidth <= w.clientWidth);
+      }
+      w.addEventListener('scroll', upd); window.addEventListener('resize', upd); upd();
+    });
+  }
 
   /* ---------- คะแนนความแข็งแรง 7 ข้อ ---------- */
   function drawStrength(){
@@ -719,6 +811,7 @@
                  p:'ระบบตรวจได้แค่รูปแบบ ไม่ได้ตัดสินว่าเนื้อหาลึกพอจริงมั้ย ขั้นต่อไปคือเอาไปคุยกับหุ้นส่วนหรือคนที่รู้จักลูกค้ากลุ่มนี้' });
 
     drawCoach();
+    drawStepper();
 
     document.getElementById('review').innerHTML = out.map(function(o){
       return '<div class="rv ' + (o.bad ? 'warn-x' : o.good ? 'good' : '') + '">'
@@ -762,11 +855,19 @@
   aiBtn.addEventListener('click', async function(){
     var text = canvasAsText();
     if (text.trim().length < 60){ aiNote.textContent = 'กรอกให้มากกว่านี้ก่อน ยังมีข้อมูลไม่พอให้อ่าน'; return; }
-    if (!asked){
-      if (!confirm('ข้อมูลใน Canvas จะถูกส่งออกจากเครื่องคุณไปให้ AI อ่านครั้งเดียว\n\nชื่อร้านไม่ถูกส่งไป และเราไม่เก็บข้อมูลไว้\n\nกดตกลงเพื่อส่ง')) return;
-      asked = true;
-    }
-    aiBtn.disabled = true; aiNote.textContent = 'กำลังอ่าน...';
+    if (aiBtn.disabled) return;                       // กันกดซ้ำระหว่างรอ
+    var again = asked;
+    if (!await ask(again ? 'ส่งอีกครั้ง' : 'ส่งข้อมูลไปให้ AI อ่าน',
+        (again ? 'การส่งแต่ละครั้งมีค่าใช้จ่ายจริง ถ้าไม่ได้แก้อะไรเพิ่ม ผลที่ได้จะใกล้เคียงเดิม. '
+               : '') +
+        'ข้อมูลใน Canvas จะออกจากเครื่องคุณไปให้ AI อ่านครั้งเดียว ชื่อร้านไม่ถูกส่งไป ' +
+        'เราไม่เก็บ ไม่บันทึก และใช้เวลาราว 15 วินาที',
+        again ? 'ส่งอีกครั้ง' : 'ส่งเลย')) return;
+    asked = true;
+    aiBtn.disabled = true;
+    aiBtn.setAttribute('aria-busy', 'true');
+    aiBtn.innerHTML = '<span class="spin"></span> กำลังให้ AI อ่าน…';
+    aiNote.textContent = 'ใช้เวลาราว 15 วินาที อย่าปิดหน้านี้';
     try {
       var r = await fetch('/api/review', {
         method:'POST', headers:{ 'content-type':'application/json' },
@@ -784,17 +885,23 @@
         }[d.error] || 'ไม่สำเร็จ ลองใหม่อีกครั้ง';
         return;
       }
-      var items = d.items || [];
+      var ORD = { urgent:0, should:1, option:2 };
+      var items = (d.items || []).slice().sort(function(a, b){ return (ORD[a.level] || 1) - (ORD[b.level] || 1); });
       aiNote.textContent = items.length ? 'อ่านแล้ว ' + items.length + ' ข้อ · ดูข้างบน' : 'AI ไม่พบจุดที่ต้องแก้เพิ่ม';
       var box = document.getElementById('review');
       box.insertAdjacentHTML('afterbegin', items.map(function(i){
-        return '<div class="rv ai-item ' + (i.level === 'warn' ? 'warn-x' : '') + '">'
-             + '<span class="tag">AI · ' + esc((BLOCK_NAME[i.block] || 'ทั้งหมด')) + '</span>'
+        var LV = { urgent:'เร่งด่วน', should:'ควรทำ', option:'ทางเลือก' };
+        return '<div class="rv ai-item ' + (i.level === 'urgent' ? 'warn-x' : i.level === 'option' ? 'good' : '') + '">'
+             + '<span class="tag">' + esc(LV[i.level] || 'ควรทำ') + ' · ' + esc(BLOCK_NAME[i.block] || 'ทั้งหมด') + '</span>'
              + '<div><h4>' + esc(i.title) + '</h4><p>' + esc(i.note) + '</p></div></div>';
       }).join(''));
     } catch(e){
       aiNote.textContent = 'ต่อเน็ตไม่ได้ ลองใหม่อีกครั้ง';
-    } finally { aiBtn.disabled = false; }
+    } finally {
+      aiBtn.disabled = false;
+      aiBtn.removeAttribute('aria-busy');
+      aiBtn.textContent = asked ? 'ส่งอีกครั้ง (มีค่าใช้จ่าย)' : 'ส่งไปให้ AI อ่าน';
+    }
   });
 
   /* ---------- พิมพ์ ---------- */
@@ -809,8 +916,11 @@
   window.addEventListener('beforeprint', expandAll);
   window.addEventListener('afterprint', resetAll);
 
-  document.getElementById('clear').addEventListener('click', function(){
-    if (!confirm('ล้างข้อมูลทั้งหมดในหน้านี้ ทำแล้วย้อนกลับไม่ได้')) return;
+  document.getElementById('clear').addEventListener('click', async function(){
+    if (!await ask('ล้างข้อมูลทั้งหมด',
+        'ทุกอย่างในหน้านี้จะถูกลบ ทั้งตารางกลุ่มลูกค้า Canvas ทั้ง 9 ช่อง ตัวเลข และคะแนน ' +
+        'ทำแล้วย้อนกลับไม่ได้ ถ้ายังไม่ได้บันทึกเป็น PDF ให้กดยกเลิกแล้วไปพิมพ์เก็บไว้ก่อน',
+        'ล้างทั้งหมด', true)) return;
     state = { shop:'', blocks:{}, nums:{}, segs:[ blankSeg(), blankSeg() ], vps:{}, tags:{}, str:{} };
     shop.value = '';
     fields.forEach(function(f){ f.value = ''; });
@@ -821,7 +931,7 @@
 
   window.addEventListener('load', function(){ drawCoach(); });
 
-  load(); drawSTP(); drawTGT(); drawVP(); drawChips(); drawStrength(); scoreStrength(); save(); review();
+  load(); drawStepper(); drawSTP(); drawTGT(); drawVP(); drawChips(); drawStrength(); scoreStrength(); save(); review();
 })();
 </script>
 
