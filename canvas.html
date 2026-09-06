@@ -7,6 +7,7 @@
 <meta name="description" content="กรอก Business Model Canvas 9 ช่องของร้านคุณ เซฟอัตโนมัติในเบราว์เซอร์ ไม่ต้องสมัครสมาชิก สั่งพิมพ์เป็น PDF ได้">
 <link rel="stylesheet" href="/fonts/anuphan.css">
 <link rel="stylesheet" href="/styles.css">
+<script src="/rules.js"></script>
 <link rel="canonical" href="https://restaurantbmc.vercel.app/canvas.html">
 <meta property="og:url" content="https://restaurantbmc.vercel.app/canvas.html">
 <meta name="robots" content="index, follow">
@@ -104,6 +105,29 @@
   <span class="status" id="status">ยังไม่ได้กรอก</span>
 </div>
 
+
+<section class="step" id="step-cs">
+  <p class="step-n">ขั้นที่ 1</p>
+  <h2>กลุ่มลูกค้า — เราทำร้านให้ "ใคร"</h2>
+  <p class="step-lede">
+    ช่องนี้ต้องตอบก่อนช่องอื่น เพราะเมนู ราคา ทำเล บรรยากาศ ล้วนต้องตอบสนองคนกลุ่มนี้
+    กรอกให้เจาะจงจนนึกภาพคนคนนั้นออก แล้วค่อยเอาไปสรุปลงตาราง Canvas ข้างล่าง
+  </p>
+  <div class="tw"><table class="stp" id="stp"></table></div>
+  <div class="seg-actions noprint">
+    <button class="mini" id="addseg" type="button">+ เพิ่มกลุ่มลูกค้า</button>
+    <button class="mini" id="delseg" type="button">− ลบกลุ่มสุดท้าย</button>
+  </div>
+
+  <h3 style="margin:30px 0 6px">แล้วกลุ่มไหนควรเป็นกลุ่มหลัก</h3>
+  <p class="step-lede">ให้ดาว 1–5 ตามเกณฑ์ กลุ่มที่ได้ดาวรวมสูงสุดจะถูกไฮไลต์เป็นกลุ่มหลัก</p>
+  <div class="tw"><table class="stp" id="tgt"></table></div>
+</section>
+
+<section class="step">
+  <p class="step-n">ขั้นที่ 2</p>
+  <h2>Canvas ทั้ง 9 ช่อง</h2>
+  <p class="step-lede">ช่องกลุ่มลูกค้าให้เขียนสรุปสั้น ๆ จากตารางข้างบน — กดปุ่มด้านล่างให้ร่างให้ก่อนก็ได้</p>
 <div class="fill">
   <div class="f c-kp"><div class="n">01</div><label for="kp">พันธมิตรหลัก</label>
     <p class="hint">ใครที่ถ้าหายไปแล้วร้านสะดุด</p>
@@ -141,6 +165,47 @@
     <p class="hint">เงินเข้าทางไหน ยอดต่อบิลเท่าไหร่</p>
     <textarea id="rs" data-k="rs" placeholder="ขายหน้าร้าน · เดลิเวอรี · จัดเลี้ยง · ยอดต่อบิลเฉลี่ย กี่บิลต่อวัน"></textarea></div>
 </div>
+  <div class="seg-actions noprint"><button class="mini" id="draftcs" type="button">ร่างช่องกลุ่มลูกค้าจากตารางข้างบน</button></div>
+</section>
+
+
+<section class="step" id="step-nums">
+  <p class="step-n">ขั้นที่ 3</p>
+  <h2>ตัวเลข — โมเดลนี้เลี้ยงตัวเองได้มั้ย</h2>
+  <p class="step-lede">
+    ช่องต้นทุนคือช่องที่พิสูจน์ว่าโมเดลเวิร์คจริง กรอกเท่าที่รู้ ระบบจะคำนวณจุดคุ้มทุนให้
+    แล้วเทียบกับช่วงมาตรฐานของธุรกิจร้านอาหารว่าช่องไหนเกิน
+  </p>
+  <div class="nums">
+    <div class="nf"><label for="n-rent">ค่าเช่า</label><span class="u">บาท/เดือน</span>
+      <input id="n-rent" data-n="rent" type="number" min="0" inputmode="numeric" placeholder="30000"></div>
+    <div class="nf"><label for="n-staff">ค่าแรงพนักงาน</label><span class="u">บาท/เดือน รวมทุกคน</span>
+      <input id="n-staff" data-n="staff" type="number" min="0" inputmode="numeric" placeholder="36000"></div>
+    <div class="nf"><label for="n-fix">ต้นทุนคงที่อื่น</label><span class="u">บาท/เดือน — น้ำ ไฟ บัญชี POS</span>
+      <input id="n-fix" data-n="fix" type="number" min="0" inputmode="numeric" placeholder="25000"></div>
+    <div class="nf"><label for="n-cogs">ต้นทุนวัตถุดิบ</label><span class="u">% ของยอดขาย</span>
+      <input id="n-cogs" data-n="cogs" type="number" min="0" max="100" step="0.1" inputmode="decimal" placeholder="35"></div>
+    <div class="nf"><label for="n-gp">GP เดลิเวอรี</label><span class="u">% ของยอดขาย — ไม่มีใส่ 0</span>
+      <input id="n-gp" data-n="gp" type="number" min="0" max="100" step="0.1" inputmode="decimal" placeholder="0"></div>
+    <div class="nf"><label for="n-var">ผันแปรอื่น</label><span class="u">% — เซอร์วิสชาร์จ การตลาด</span>
+      <input id="n-var" data-n="var" type="number" min="0" max="100" step="0.1" inputmode="decimal" placeholder="7"></div>
+    <div class="nf"><label for="n-ta">ยอดขายเฉลี่ยต่อหัว</label><span class="u">บาท</span>
+      <input id="n-ta" data-n="ta" type="number" min="0" inputmode="numeric" placeholder="120"></div>
+    <div class="nf"><label for="n-rev">ยอดขายที่คาดไว้</label><span class="u">บาท/เดือน — ไม่ใส่ก็ได้</span>
+      <input id="n-rev" data-n="rev" type="number" min="0" inputmode="numeric" placeholder="400000"></div>
+  </div>
+  <div class="calc empty" id="calc"><p>กรอกค่าเช่า ค่าแรง และต้นทุนวัตถุดิบ แล้วจุดคุ้มทุนจะขึ้นตรงนี้</p></div>
+</section>
+
+<section class="step" id="step-review">
+  <p class="step-n">ผลตรวจ</p>
+  <h2>Canvas นี้ยังขาดอะไร</h2>
+  <p class="step-lede">
+    ตรวจจากหลุมพรางและเกณฑ์ในคอร์ส Business Model Canvas ของ Torpenguin
+    ระบบตรวจได้แค่รูปแบบ ตัดสินคุณภาพเนื้อหาแทนคุณไม่ได้ — ใช้เป็นตัวเตือน ไม่ใช่คำตัดสิน
+  </p>
+  <div class="review" id="review"></div>
+</section>
 
 <p class="tip noprint">
   เซฟอัตโนมัติในเบราว์เซอร์ของคุณเอง ข้อมูลไม่ถูกส่งไปไหนและเราไม่เห็น
@@ -158,26 +223,45 @@
 
 <script>
 (function(){
-  var KEY = 'bmc-restaurant-v1';
+  var R = window.BMC_RULES;
+  var KEY = 'bmc-restaurant-v2';
+  var OLD = 'bmc-restaurant-v1';
+  var MAXSEG = 4;
+
   var fields = [].slice.call(document.querySelectorAll('[data-k]'));
-  var shop = document.getElementById('shop');
+  var nums   = [].slice.call(document.querySelectorAll('[data-n]'));
+  var shop   = document.getElementById('shop');
   var status = document.getElementById('status');
 
-  function load(){
-    var raw;
-    try { raw = localStorage.getItem(KEY); } catch(e){ return false; }   // โหมดส่วนตัวบางเบราว์เซอร์โยน error
-    if(!raw) return false;
-    var d;
-    try { d = JSON.parse(raw); } catch(e){ return false; }
-    if(d.shop) shop.value = d.shop;
-    fields.forEach(function(f){ if(d[f.dataset.k]) f.value = d[f.dataset.k]; });
-    return true;
-  }
+  var state = { shop:'', blocks:{}, nums:{}, segs:[ blankSeg(), blankSeg() ] };
+  function blankSeg(){ return { name:'' }; }
 
+  /* ---------- เก็บ/อ่าน ---------- */
+  function read(k){ try { return localStorage.getItem(k); } catch(e){ return null; } }
+  function load(){
+    var raw = read(KEY);
+    if (raw) { try { var d = JSON.parse(raw); if (d && d.blocks) state = d; } catch(e){} }
+    else {
+      // ผู้ใช้เดิมที่กรอกไว้ก่อนมีตาราง STP ต้องไม่เสียของ
+      var old = read(OLD);
+      if (old) { try {
+        var o = JSON.parse(old);
+        state.shop = o.shop || '';
+        fields.forEach(function(f){ state.blocks[f.dataset.k] = o[f.dataset.k] || ''; });
+      } catch(e){} }
+    }
+    if (!state.segs || !state.segs.length) state.segs = [ blankSeg(), blankSeg() ];
+    if (!state.nums) state.nums = {};
+    if (!state.blocks) state.blocks = {};
+    shop.value = state.shop || '';
+    fields.forEach(function(f){ f.value = state.blocks[f.dataset.k] || ''; });
+    nums.forEach(function(f){ var v = state.nums[f.dataset.n]; f.value = (v || v === 0) ? v : ''; });
+  }
   function save(){
-    var d = { shop: shop.value };
-    fields.forEach(function(f){ d[f.dataset.k] = f.value; });
-    try { localStorage.setItem(KEY, JSON.stringify(d)); }
+    state.shop = shop.value;
+    fields.forEach(function(f){ state.blocks[f.dataset.k] = f.value; });
+    nums.forEach(function(f){ state.nums[f.dataset.n] = f.value; });
+    try { localStorage.setItem(KEY, JSON.stringify(state)); }
     catch(e){ status.textContent = 'เบราว์เซอร์นี้เซฟไม่ได้ กรุณาพิมพ์เก็บไว้'; return; }
     var n = fields.filter(function(f){ return f.value.trim(); }).length;
     status.textContent = n === 0 ? 'ยังไม่ได้กรอก'
@@ -185,33 +269,247 @@
                        : 'กรอกแล้ว ' + n + ' จาก 9 ช่อง · เซฟอัตโนมัติ';
   }
 
-  // textarea มีความสูงคงที่ ตอนพิมพ์ข้อความที่เกินขอบจะถูกตัดหาย
-  // ก่อนพิมพ์จึงยืดความสูงให้พอดีเนื้อหาทุกช่อง แล้วคืนค่าเดิมหลังพิมพ์
-  function grow(f){ f.style.height='auto'; f.style.height = f.scrollHeight + 'px'; }
+  /* ---------- ตาราง STP ---------- */
+  function esc(x){ return String(x).replace(/[&<>"]/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+
+  function drawSTP(){
+    var h = '<thead><tr><th>ปัจจัย</th>';
+    state.segs.forEach(function(sg, i){
+      h += '<th><input data-seg="'+i+'" data-f="name" value="'+esc(sg.name||'')+'" placeholder="กลุ่มที่ '+(i+1)+'"></th>';
+    });
+    h += '</tr></thead><tbody>';
+    R.STP.forEach(function(g){
+      h += '<tr class="grp"><th colspan="'+(state.segs.length+1)+'">'+g.group+'</th></tr>';
+      g.rows.forEach(function(r){
+        h += '<tr><th>'+r.label+'</th>';
+        state.segs.forEach(function(sg, i){
+          h += '<td><input data-seg="'+i+'" data-f="'+r.key+'" value="'+esc(sg[r.key]||'')+'" placeholder="'+esc(r.hint)+'"></td>';
+        });
+        h += '</tr>';
+      });
+    });
+    document.getElementById('stp').innerHTML = h + '</tbody>';
+    document.getElementById('addseg').disabled = state.segs.length >= MAXSEG;
+    document.getElementById('delseg').disabled = state.segs.length <= 1;
+  }
+
+  function drawTGT(){
+    var totals = state.segs.map(function(sg){
+      return R.TARGETING.reduce(function(a, c){ return a + (parseInt(sg['t_'+c.key]) || 0); }, 0);
+    });
+    var best = Math.max.apply(null, totals);
+    var h = '<thead><tr><th>เกณฑ์</th>';
+    state.segs.forEach(function(sg, i){
+      h += '<th>' + esc(sg.name || ('กลุ่มที่ ' + (i+1))) + '</th>';
+    });
+    h += '</tr></thead><tbody>';
+    R.TARGETING.forEach(function(c){
+      h += '<tr><th>'+c.label+'<br><span style="font-weight:400;color:var(--ink-mute);font-size:12px">'+c.hint+'</span></th>';
+      state.segs.forEach(function(sg, i){
+        var v = parseInt(sg['t_'+c.key]) || 0;
+        h += '<td><div class="stars">';
+        for (var n = 1; n <= 5; n++)
+          h += '<button type="button" data-seg="'+i+'" data-t="'+c.key+'" data-v="'+n+'" class="'+(n<=v?'on':'')+'" aria-label="'+n+' ดาว">★</button>';
+        h += '</div></td>';
+      });
+      h += '</tr>';
+    });
+    h += '<tr><th>รวม</th>';
+    totals.forEach(function(t){
+      h += '<td class="'+(t && t === best ? 'win' : '')+'" style="padding:9px 11px;font-weight:700">'
+         + (t || '–') + (t && t === best ? ' · กลุ่มหลัก' : '') + '</td>';
+    });
+    document.getElementById('tgt').innerHTML = h + '</tr></tbody>';
+  }
+
+  function onSegInput(e){
+    var t = e.target;
+    if (!t.dataset || t.dataset.seg === undefined || !t.dataset.f) return;
+    state.segs[+t.dataset.seg][t.dataset.f] = t.value;
+    if (t.dataset.f === 'name') drawTGT();
+    save(); review();
+  }
+  document.getElementById('stp').addEventListener('input', onSegInput);
+
+  document.getElementById('tgt').addEventListener('click', function(e){
+    var b = e.target.closest && e.target.closest('button[data-t]');
+    if (!b) return;
+    var sg = state.segs[+b.dataset.seg], k = 't_' + b.dataset.t, v = +b.dataset.v;
+    sg[k] = (sg[k] === v) ? 0 : v;          // กดดาวเดิมซ้ำ = ยกเลิกคะแนน
+    drawTGT(); save(); review();
+  });
+
+  document.getElementById('addseg').addEventListener('click', function(){
+    if (state.segs.length >= MAXSEG) return;
+    state.segs.push(blankSeg()); drawSTP(); drawTGT(); save(); review();
+  });
+  document.getElementById('delseg').addEventListener('click', function(){
+    if (state.segs.length <= 1) return;
+    if (!confirm('ลบกลุ่มลูกค้ากลุ่มสุดท้าย พร้อมข้อมูลในคอลัมน์นั้น')) return;
+    state.segs.pop(); drawSTP(); drawTGT(); save(); review();
+  });
+
+  document.getElementById('draftcs').addEventListener('click', function(){
+    var lines = state.segs.map(function(sg, i){
+      var bits = [];
+      R.STP.forEach(function(g){ g.rows.forEach(function(r){
+        if (sg[r.key] && sg[r.key].trim()) bits.push(sg[r.key].trim());
+      }); });
+      if (!bits.length) return '';
+      return (sg.name || ('กลุ่มที่ ' + (i+1))) + ': ' + bits.join(' · ');
+    }).filter(Boolean);
+    if (!lines.length) { alert('ยังไม่มีข้อมูลในตาราง STP ให้ร่าง'); return; }
+    var cs = document.getElementById('cs');
+    if (cs.value.trim() && !confirm('ช่องกลุ่มลูกค้ามีข้อความอยู่แล้ว ต้องการเขียนทับ')) return;
+    cs.value = lines.join('\n');
+    save(); review();
+  });
+
+  /* ---------- ตัวเลข: จุดคุ้มทุน + เทียบเกณฑ์ ---------- */
+  function num(k){ var v = parseFloat(state.nums[k]); return isFinite(v) ? v : 0; }
+  function baht(x){ return Math.round(x).toLocaleString('th-TH'); }
+
+  function calc(){
+    var box = document.getElementById('calc');
+    var fixed = num('rent') + num('staff') + num('fix');
+    var varp  = num('cogs') + num('gp') + num('var');
+    if (!fixed || !num('cogs')) {
+      box.className = 'calc empty';
+      box.innerHTML = '<p>กรอกค่าเช่า ค่าแรง และต้นทุนวัตถุดิบ แล้วจุดคุ้มทุนจะขึ้นตรงนี้</p>';
+      return null;
+    }
+    if (varp >= 100) {
+      box.className = 'calc';
+      box.innerHTML = '<p class="big">ต้นทุนผันแปรรวม ' + varp + '%</p>'
+        + '<p>เกิน 100% ของยอดขาย แปลว่ายิ่งขายยิ่งขาดทุน ไม่มีจุดคุ้มทุน ต้องแก้ราคาหรือต้นทุนก่อน</p>';
+      return { bad:true };
+    }
+    var bep = fixed / (1 - varp/100);
+    var rev = num('rev') || bep;
+    var ta  = num('ta');
+    var heads = ta ? bep / ta / 30 : 0;
+
+    var h = '<p class="big">จุดคุ้มทุน ' + baht(bep) + ' บาท/เดือน</p>';
+    h += '<p>' + (heads ? 'ต้องขายให้ได้ประมาณ <b>' + heads.toFixed(1) + ' หัวต่อวัน</b> ถึงจะไม่ขาดทุน '
+                        : 'ใส่ยอดขายเฉลี่ยต่อหัว แล้วจะบอกได้ว่าต้องขายกี่หัวต่อวัน ')
+       + '<span style="opacity:.75">(ต้นทุนคงที่ ' + baht(fixed) + ' ÷ (100% − ' + varp + '%))</span></p>';
+
+    // เทียบเกณฑ์ — คิดเป็น % ของยอดขายที่คาดไว้ ถ้าไม่ใส่ใช้จุดคุ้มทุนเป็นฐาน
+    var actual = {
+      cogs: num('cogs'),
+      labor: rev ? num('staff') / rev * 100 : 0,
+      occupancy: rev ? num('rent') / rev * 100 : 0
+    };
+    h += '<div class="bm"><div class="bm-row" style="opacity:.75"><span class="nm">เทียบเกณฑ์</span>'
+       + '<span>คิดจากยอดขาย ' + baht(rev) + ' บาท/เดือน' + (num('rev') ? '' : ' (ใช้จุดคุ้มทุนเป็นฐาน)') + '</span></div>';
+    R.COST.forEach(function(c){
+      if (!(c.key in actual)) return;
+      var a = actual[c.key], over = a > c.max;
+      h += '<div class="bm-row"><span class="nm">' + c.label + '</span>'
+         + '<span>' + a.toFixed(1) + '%</span>'
+         + '<span style="opacity:.7">เกณฑ์ ' + c.min + '–' + c.max + '%</span>'
+         + '<span class="' + (over ? 'no' : 'ok') + '">' + (over ? 'เกินเกณฑ์' : 'อยู่ในเกณฑ์') + '</span></div>';
+    });
+    var prime = actual.cogs + actual.labor;
+    h += '<div class="bm-row"><span class="nm">Prime Cost</span><span>' + prime.toFixed(1) + '%</span>'
+       + '<span style="opacity:.7">ไม่ควรเกิน ' + R.PRIME_COST_MAX + '%</span>'
+       + '<span class="' + (prime > R.PRIME_COST_MAX ? 'no' : 'ok') + '">'
+       + (prime > R.PRIME_COST_MAX ? 'เกินเกณฑ์' : 'อยู่ในเกณฑ์') + '</span></div></div>';
+
+    box.className = 'calc';
+    box.innerHTML = h;
+    return { bep:bep, prime:prime, actual:actual, rev:rev };
+  }
+
+  /* ---------- ผลตรวจ ---------- */
+  function review(){
+    var d = {};
+    fields.forEach(function(f){ d[f.dataset.k] = f.value || ''; });
+    var out = [];
+
+    // ช่องที่ยังว่าง
+    var empty = fields.filter(function(f){ return !f.value.trim(); });
+    if (empty.length)
+      out.push({ k:'ยังว่าง', t:'ยังไม่ได้กรอก ' + empty.length + ' ช่อง',
+                 p:'ช่องที่เหลือ: ' + empty.map(function(f){
+                     return document.querySelector('label[for="'+f.id+'"]').textContent; }).join(' · ') });
+
+    // ตาราง STP
+    var filled = state.segs.filter(function(sg){
+      return R.STP.some(function(g){ return g.rows.some(function(r){ return (sg[r.key]||'').trim(); }); }); });
+    if (!filled.length)
+      out.push({ k:'ขั้นที่ 1', t:'ยังไม่ได้กรอกตารางกลุ่มลูกค้า',
+                 p:'สไลด์บอกว่าต้องเริ่มจากลูกค้าก่อนเสมอ ไม่ใช่เริ่มจาก "อยากเปิดร้าน" — เริ่มจากไอเดียคือ Market Risk เต็ม ๆ' });
+    else if (filled.length === 1 && state.segs.length > 1)
+      out.push({ k:'ขั้นที่ 1', t:'กรอกกลุ่มลูกค้าไว้กลุ่มเดียว', p:'ถ้ามีแค่กลุ่มเดียวจริงก็ไม่ผิด แต่ลองคิดดูว่ามีคนอีกแบบที่มาด้วยเหตุผลคนละอย่างมั้ย เช่น มื้อเช้ากับมื้อบ่าย' });
+
+    // คำที่บอกว่ายังไม่ลึกพอ
+    var flagged = {};
+    R.FLAGS.forEach(function(f){
+      if (d[f.block] && f.re.test(d[f.block])) {
+        flagged[f.block] = true;
+        out.push({ bad:true, k:'หลุมพราง', t:f.msg, p:f.fix });
+      }
+    });
+
+    // ความสัมพันธ์ต้องเป็น "แบบ" — ข้ามถ้าเตือนเรื่องเดียวกันไปแล้วข้างบน
+    if (!flagged.cr && d.cr.trim() && !R.REL_TYPES.some(function(t){
+        return new RegExp(t.v.replace('-','\\-'), 'i').test(d.cr) ||
+               /จำลูกค้าได้|ลูกค้าทำเอง|อัตโนมัติ|ชุมชน|ร่วมออกแบบ/.test(d.cr); }))
+      out.push({ k:'ช่อง 05', t:'ยังไม่ได้ระบุว่าเป็นความสัมพันธ์แบบไหน',
+                 p:'เลือกสักแบบ: ' + R.REL_TYPES.map(function(t){ return t.v; }).join(' · ') });
+
+    // ตัวเลขในช่องต้นทุน
+    if (d.co.trim() && !/%/.test(d.co))
+      out.push({ k:'ช่อง 08', t:'ช่องต้นทุนยังไม่มีตัวเลขเป็นเปอร์เซ็นต์',
+                 p:'ไม่แยกคงที่กับผันแปรเป็น % จะตั้งราคาและคุมกำไรไม่ได้ ลองกรอกในขั้นที่ 3 ระบบคำนวณจุดคุ้มทุนให้' });
+
+    // กฎข้ามช่อง
+    R.CROSS.forEach(function(c){
+      var ok = false; try { ok = c.when(d); } catch(e){}
+      if (ok) out.push({ bad:true, k:'ช่องขัดกัน', t:c.msg, p:c.fix });
+    });
+
+    // ตัวเลข
+    var n = calc();
+    if (n && n.prime > R.PRIME_COST_MAX)
+      out.push({ bad:true, k:'ตัวเลข', t:'Prime Cost ' + n.prime.toFixed(1) + '% เกิน ' + R.PRIME_COST_MAX + '%',
+                 p:'อาหารบวกค่าแรงกินเกินเกณฑ์ ทางแก้: ลดต้นทุนวัตถุดิบ ลดพนักงานประจำเพิ่มพาร์ทไทม์ หรือเพิ่มยอดต่อหัว' });
+
+    if (!out.length)
+      out.push({ good:true, k:'ผ่าน', t:'ยังไม่เจอหลุมพรางจากรายการที่ตรวจได้',
+                 p:'ระบบตรวจได้แค่รูปแบบ ไม่ได้ตัดสินว่าเนื้อหาลึกพอจริงมั้ย ขั้นต่อไปคือเอาไปคุยกับหุ้นส่วนหรือคนที่รู้จักลูกค้ากลุ่มนี้' });
+
+    document.getElementById('review').innerHTML = out.map(function(o){
+      return '<div class="rv ' + (o.bad ? 'warn-x' : o.good ? 'good' : '') + '">'
+           + '<span class="tag">' + esc(o.k) + '</span><div><h4>' + esc(o.t) + '</h4><p>' + o.p + '</p></div></div>';
+    }).join('');
+  }
+
+  /* ---------- พิมพ์ ---------- */
+  function grow(f){ f.style.height = 'auto'; f.style.height = f.scrollHeight + 'px'; }
   function expandAll(){ fields.forEach(grow); }
-  function resetAll(){ fields.forEach(function(f){ f.style.height=''; }); }
+  function resetAll(){ fields.forEach(function(f){ f.style.height = ''; }); }
 
-  fields.concat([shop]).forEach(function(f){
-    f.addEventListener('input', save);
+  fields.concat(nums).concat([shop]).forEach(function(f){
+    f.addEventListener('input', function(){ save(); review(); });
   });
-
-  document.getElementById('print').addEventListener('click', function(){
-    expandAll();
-    window.print();
-  });
+  document.getElementById('print').addEventListener('click', function(){ expandAll(); window.print(); });
   window.addEventListener('beforeprint', expandAll);
   window.addEventListener('afterprint', resetAll);
 
   document.getElementById('clear').addEventListener('click', function(){
-    if(!confirm('ล้างข้อมูลทั้งหมดในหน้านี้ ทำแล้วย้อนกลับไม่ได้')) return;
+    if (!confirm('ล้างข้อมูลทั้งหมดในหน้านี้ ทำแล้วย้อนกลับไม่ได้')) return;
+    state = { shop:'', blocks:{}, nums:{}, segs:[ blankSeg(), blankSeg() ] };
     shop.value = '';
     fields.forEach(function(f){ f.value = ''; });
-    try { localStorage.removeItem(KEY); } catch(e){}
-    save();
+    nums.forEach(function(f){ f.value = ''; });
+    try { localStorage.removeItem(KEY); localStorage.removeItem(OLD); } catch(e){}
+    drawSTP(); drawTGT(); save(); review();
   });
 
-  load();
-  save();
+  load(); drawSTP(); drawTGT(); save(); review();
 })();
 </script>
 

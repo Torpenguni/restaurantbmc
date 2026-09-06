@@ -154,3 +154,92 @@ footer .wrap{display:flex;gap:18px;justify-content:space-between;flex-wrap:wrap}
   .top nav a{padding:7px 11px;font-size:14px}
   body{font-size:16px}
 }
+
+/* ============================================================
+   หน้ากรอก — ตาราง STP, ส่วนตัวเลข, ผลตรวจ
+   ============================================================ */
+.step{padding:34px 0;border-bottom:2px solid var(--rule)}
+.step-n{font-size:13px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink-mute);margin:0 0 10px}
+.step h2{margin-bottom:8px}
+.step-lede{color:var(--ink-mute);max-width:66ch;margin:0 0 20px}
+
+/* ตาราง STP — เมทริกซ์ไม่ควรพับบรรทัดบนจอแคบ ให้เลื่อนในกรอบตัวเองแทน */
+.tw{overflow-x:auto;border:2px solid var(--rule);background:var(--paper-2)}
+table.stp{border-collapse:collapse;width:100%;min-width:620px}
+table.stp th,table.stp td{border:1px solid var(--rule-soft);padding:0;vertical-align:top}
+table.stp thead th{
+  background:var(--rule);color:var(--paper);font-size:14px;font-weight:600;
+  padding:10px 12px;text-align:left;position:relative;
+}
+table.stp thead th:first-child{width:170px;min-width:170px}
+table.stp tbody th{
+  background:#f3f2ec;font-size:13.5px;font-weight:600;text-align:left;
+  padding:9px 12px;width:170px;min-width:170px;
+}
+table.stp tbody tr.grp th{background:var(--note);font-size:12px;letter-spacing:0.1em;text-transform:uppercase}
+table.stp td input,table.stp th input{
+  width:100%;border:0;background:transparent;font:inherit;font-size:14px;
+  padding:9px 11px;color:var(--ink);
+}
+table.stp thead th input{color:var(--paper);font-weight:600}
+table.stp thead th input::placeholder{color:rgba(255,255,255,.55)}
+table.stp td input:focus,table.stp th input:focus{outline:none;background:#fffdf2}
+table.stp thead th input:focus{background:rgba(255,255,255,.15)}
+.seg-actions{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+.mini{
+  font:inherit;font-size:14px;font-weight:600;cursor:pointer;
+  border:2px solid var(--rule);background:transparent;border-radius:999px;padding:8px 15px;
+}
+.mini:hover{background:#efeee7}
+.mini[disabled]{opacity:.35;cursor:not-allowed}
+
+/* ดาวให้คะแนน Targeting */
+.stars{display:flex;gap:3px;padding:7px 11px}
+.stars button{
+  border:0;background:transparent;cursor:pointer;font-size:17px;line-height:1;
+  padding:0 1px;color:var(--rule-soft);
+}
+.stars button.on{color:var(--note-deep)}
+.win{background:var(--note) !important;font-weight:700}
+
+/* ส่วนตัวเลข */
+.nums{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(210px,100%),1fr));gap:2px;background:var(--rule);border:2px solid var(--rule)}
+.nf{background:var(--paper-2);padding:13px 14px}
+.nf label{display:block;font-size:13.5px;font-weight:600;margin-bottom:2px}
+.nf .u{font-size:12px;color:var(--ink-mute)}
+.nf input{width:100%;font:inherit;font-size:17px;font-weight:600;border:0;border-bottom:1.5px dashed var(--rule-soft);background:transparent;padding:5px 0;color:var(--ink)}
+.nf input:focus{outline:none;border-bottom-style:solid;border-color:var(--rule)}
+.calc{border:2px solid var(--rule);border-top:0;background:var(--note);padding:20px 18px}
+.calc.empty{background:var(--paper-2);color:var(--ink-mute)}
+.calc .big{font-size:clamp(24px,3.4vw,34px);font-weight:700;line-height:1.3;margin:0 0 6px}
+.calc p{margin:0;max-width:none}
+.bm{margin-top:16px;border-top:1.5px solid rgba(0,0,0,.18);padding-top:12px}
+.bm-row{display:flex;gap:10px;align-items:baseline;font-size:14.5px;padding:3px 0;flex-wrap:wrap}
+.bm-row .nm{min-width:130px;font-weight:600}
+.bm-row .ok{color:#12513f;font-weight:600}
+.bm-row .no{color:#a1231b;font-weight:700}
+
+/* ผลตรวจ */
+.review{border:2px solid var(--rule);background:var(--paper-2)}
+.rv{padding:16px 18px;border-bottom:1px solid var(--rule-soft);display:flex;gap:13px;align-items:flex-start}
+.rv:last-child{border-bottom:0}
+.rv .tag{
+  flex:0 0 auto;font-size:11.5px;font-weight:700;letter-spacing:0.06em;
+  padding:3px 9px;border-radius:3px;background:var(--note);white-space:nowrap;margin-top:2px;
+}
+.rv.warn-x .tag{background:#ffd0c9}
+.rv.good .tag{background:#c9e7d8}
+.rv h4{margin:0 0 3px;font-size:15.5px;font-weight:700;line-height:1.45}
+.rv p{margin:0;font-size:14.5px;color:var(--ink-mute);line-height:1.65;max-width:none}
+.rv p b{color:var(--ink);font-weight:600}
+
+@media (max-width:560px){
+  .bm-row .nm{min-width:0;width:100%}
+}
+@media print{
+  .step{padding:10px 0}
+  .tw{overflow:visible}
+  table.stp{min-width:0;font-size:9pt}
+  .mini,.seg-actions,.stars button{display:none}
+  .review,.calc{break-inside:avoid}
+}
