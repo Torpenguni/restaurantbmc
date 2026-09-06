@@ -10,7 +10,9 @@
 
 const MODEL      = process.env.BMC_MODEL || 'claude-haiku-4-5-20251001';
 const MAX_BODY   = 12000;   // ตัวอักษร — canvas ที่กรอกเต็มยาวราว 3-4 พัน
-const MAX_OUTPUT = 1200;    // เพดาน token ขาออก กันบิลบานปลาย
+const MAX_OUTPUT = 2400;    // เพดาน token ขาออก กันบิลบานปลาย
+                            // ไทยกิน token ต่อตัวอักษรมากกว่าอังกฤษหลายเท่า
+                            // 1200 ทำให้คำตอบ 5 ข้อถูกตัดกลางจน JSON ไม่ปิด
 const WINDOW_MS  = 60000;
 const PER_WINDOW = 4;
 
@@ -43,7 +45,8 @@ const SYSTEM = `คุณคือที่ปรึกษาธุรกิจ�
 - ชี้จุดที่อ่อนจริง ไม่ต้องชม ไม่ต้องสรุปซ้ำสิ่งที่เขาเขียน
 - ทุกข้อต้องบอกด้วยว่าให้ไปทำอะไรต่อ
 - ถ้าข้อมูลไม่พอจะตัดสิน ให้บอกว่าขาดอะไร อย่าเดา
-- สูงสุด 5 ข้อ เรียงจากเรื่องที่กระทบเงินมากที่สุดก่อน
+- สูงสุด 4 ข้อ เรียงจากเรื่องที่กระทบเงินมากที่สุดก่อน
+- แต่ละข้อ note ไม่เกิน 2 ประโยค
 
 ตอบเป็น JSON เท่านั้น ห้ามมีข้อความอื่นนอก JSON
 {"items":[{"block":"cs|vp|ch|cr|rs|kr|ka|kp|co|all","level":"warn|note","title":"ประโยคเดียวว่าปัญหาคืออะไร","note":"อธิบายและบอกว่าให้ทำอะไรต่อ"}]}`;
@@ -110,8 +113,19 @@ module.exports = async (req, res) => {
     for (let i = end; i > 0 && !out; i = text.lastIndexOf('}', i - 1)) {
       try { out = JSON.parse(text.slice(0, i + 1)); } catch (e) { /* ลองตัวถัดไป */ }
     }
-    if (!out) return res.status(502).json({ error: 'parse' });
-    const items = Array.isArray(out.items) ? out.items.slice(0, 5) : [];
+    // ถ้าโดนตัดกลางเพราะชน max_tokens ให้ปิดวงเล็บที่ค้างแล้วลองอีกที
+    if (!out && data.stop_reason === 'max_tokens') {
+      const cut = text.lastIndexOf('},');
+      if (cut > 0) {
+        try { out = JSON.parse(text.slice(0, cut + 1) + ']}'); } catch (e) { /* ยอมแพ้ */ }
+      }
+    }
+    if (!out)
+      return res.status(502).json({
+        error: data.stop_reason === 'max_tokens' ? 'truncated' : 'parse',
+        stop: data.stop_reason || null
+      });
+    const items = Array.isArray(out.items) ? out.items.slice(0, 4) : [];
 
     return res.status(200).json({
       items: items.map(i => ({
