@@ -304,3 +304,18 @@ table.stp thead th input:focus{background:rgba(255,255,255,.15)}
 .coach .rd a:hover{border-bottom-color:var(--rule)}
 .coach .rd a::before{content:'↗ ';color:var(--ink-mute)}
 @media print{ .coach{display:none} }
+
+/* ---------- ปุ่มขอความเห็นเชิงลึก (ส่งข้อมูลออกนอกเครื่อง) ---------- */
+.ai{border:2px solid var(--rule);border-top:0;background:var(--paper-2);padding:18px}
+.ai h3{margin:0 0 6px;font-size:16.5px}
+.ai p{font-size:14px;color:var(--ink-mute);margin:0 0 12px;max-width:none}
+.ai .warnbox{
+  border:1.5px solid var(--rule);background:var(--note);
+  padding:12px 14px;margin:0 0 12px;font-size:14px;line-height:1.65;color:var(--ink);
+}
+.ai .warnbox b{font-weight:700}
+.ai .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.ai .note{font-size:13px;color:var(--ink-mute)}
+.rv.ai-item .tag{background:#dbe7f5}
+.rv.ai-item.warn-x .tag{background:#ffd0c9}
+@media print{ .ai .row{display:none} }

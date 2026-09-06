@@ -220,6 +220,24 @@
     ระบบตรวจได้แค่รูปแบบ ตัดสินคุณภาพเนื้อหาแทนคุณไม่ได้ — ใช้เป็นตัวเตือน ไม่ใช่คำตัดสิน
   </p>
   <div class="review" id="review"></div>
+
+  <div class="ai noprint" id="aibox">
+    <h3>อยากได้ความเห็นที่ลึกกว่านี้</h3>
+    <p>
+      การตรวจข้างบนดูได้แค่รูปแบบ — จับคำต้องห้าม ตัวเลขที่หายไป และช่องที่ขัดกัน
+      แต่ตัดสินไม่ได้ว่าคำตอบของคุณ<em>ลึกพอ</em>มั้ย ถ้าอยากได้ระดับนั้นต้องให้ AI อ่าน
+    </p>
+    <div class="warnbox">
+      <b>ข้อมูลจะออกจากเครื่องคุณ</b> — ทุกอย่างในหน้านี้ยกเว้นชื่อร้าน
+      จะถูกส่งไปให้ AI อ่านครั้งเดียวแล้วส่งคำตอบกลับ เราไม่เก็บ ไม่บันทึก ไม่เอาไปเทรน
+      ส่วนอื่นของเว็บยังทำงานในเครื่องคุณเหมือนเดิม ถ้าไม่กดปุ่มนี้ ก็ไม่มีอะไรถูกส่งไปไหน
+    </div>
+    <div class="row">
+      <button class="btn btn-solid" id="askai" type="button">ส่งไปให้ AI อ่าน</button>
+      <span class="note" id="ainote"></span>
+    </div>
+  </div>
+
 </section>
 
 <p class="tip noprint">
@@ -707,6 +725,77 @@
            + '<span class="tag">' + esc(o.k) + '</span><div><h4>' + esc(o.t) + '</h4><p>' + o.p + '</p></div></div>';
     }).join('');
   }
+
+
+  /* ---------- ขอความเห็นเชิงลึกจาก AI (ต้องกดเองเท่านั้น) ---------- */
+  function canvasAsText(){
+    var L = [];
+    var act = activeSegs();
+    act.forEach(function(i){
+      var sg = state.segs[i], bits = [];
+      R.STP.forEach(function(g){ g.rows.forEach(function(r){
+        if ((sg[r.key] || '').trim()) bits.push(r.label + ' ' + sg[r.key].trim()); }); });
+      L.push('กลุ่มลูกค้า ' + segColor(i).key + (sg.name ? ' (' + sg.name + ')' : '') + ': ' + (bits.join(' · ') || '-'));
+      if (state.vps[i]) L.push('  คุณค่าสำหรับกลุ่ม ' + segColor(i).key + ': ' + state.vps[i]);
+    });
+    var NM = { ch:'ช่องทาง', cr:'ความสัมพันธ์', rs:'รายได้',
+               kr:'ทรัพยากรหลัก', ka:'กิจกรรมหลัก', kp:'พันธมิตรหลัก', co:'โครงสร้างต้นทุน' };
+    Object.keys(NM).forEach(function(k){
+      var v = (state.blocks[k] || '').trim(); if (!v) return;
+      var tg = (state.tags[k] || []).map(function(i){ return segColor(i).key; });
+      L.push(NM[k] + (tg.length ? ' [ตอบกลุ่ม ' + tg.join(',') + ']' : '') + ': ' + v);
+    });
+    var n = state.nums, has = ['rent','staff','fix','cogs','gp','var','ta','rev'].some(function(k){ return n[k]; });
+    if (has) L.push('ตัวเลข: ค่าเช่า ' + (n.rent||'-') + ' ค่าแรง ' + (n.staff||'-') +
+      ' คงที่อื่น ' + (n.fix||'-') + ' วัตถุดิบ ' + (n.cogs||'-') + '% GP ' + (n.gp||'-') +
+      '% ผันแปรอื่น ' + (n.var||'-') + '% ต่อหัว ' + (n.ta||'-') + ' ยอดคาด ' + (n.rev||'-'));
+    var st = R.STRENGTH.filter(function(q){ return state.str[q.key] !== undefined && state.str[q.key] !== ''; });
+    if (st.length) L.push('คะแนนความแข็งแรงที่ให้ตัวเอง: ' +
+      st.map(function(q){ return q.label + ' ' + state.str[q.key] + '/10'; }).join(' · '));
+    return L.join('\n');
+  }
+
+  var aiBtn = document.getElementById('askai');
+  var aiNote = document.getElementById('ainote');
+  var asked = false;
+
+  aiBtn.addEventListener('click', async function(){
+    var text = canvasAsText();
+    if (text.trim().length < 60){ aiNote.textContent = 'กรอกให้มากกว่านี้ก่อน ยังมีข้อมูลไม่พอให้อ่าน'; return; }
+    if (!asked){
+      if (!confirm('ข้อมูลใน Canvas จะถูกส่งออกจากเครื่องคุณไปให้ AI อ่านครั้งเดียว\n\nชื่อร้านไม่ถูกส่งไป และเราไม่เก็บข้อมูลไว้\n\nกดตกลงเพื่อส่ง')) return;
+      asked = true;
+    }
+    aiBtn.disabled = true; aiNote.textContent = 'กำลังอ่าน...';
+    try {
+      var r = await fetch('/api/review', {
+        method:'POST', headers:{ 'content-type':'application/json' },
+        body: JSON.stringify({ canvas: text })
+      });
+      var d = await r.json().catch(function(){ return {}; });
+      if (!r.ok){
+        aiNote.textContent = {
+          unconfigured:'ยังไม่ได้ตั้งค่า API key ที่ Vercel — ฟีเจอร์นี้จึงยังใช้ไม่ได้',
+          rate:'ขอบ่อยเกินไป รออีกสักครู่แล้วลองใหม่',
+          'too-short':'ยังมีข้อมูลไม่พอให้อ่าน',
+          origin:'เรียกจากที่อื่นไม่ได้',
+          upstream:'ต้นทางตอบกลับผิดพลาด ลองใหม่อีกครั้ง',
+          parse:'อ่านคำตอบไม่ได้ ลองใหม่อีกครั้ง'
+        }[d.error] || 'ไม่สำเร็จ ลองใหม่อีกครั้ง';
+        return;
+      }
+      var items = d.items || [];
+      aiNote.textContent = items.length ? 'อ่านแล้ว ' + items.length + ' ข้อ · ดูข้างบน' : 'AI ไม่พบจุดที่ต้องแก้เพิ่ม';
+      var box = document.getElementById('review');
+      box.insertAdjacentHTML('afterbegin', items.map(function(i){
+        return '<div class="rv ai-item ' + (i.level === 'warn' ? 'warn-x' : '') + '">'
+             + '<span class="tag">AI · ' + esc((BLOCK_NAME[i.block] || 'ทั้งหมด')) + '</span>'
+             + '<div><h4>' + esc(i.title) + '</h4><p>' + esc(i.note) + '</p></div></div>';
+      }).join(''));
+    } catch(e){
+      aiNote.textContent = 'ต่อเน็ตไม่ได้ ลองใหม่อีกครั้ง';
+    } finally { aiBtn.disabled = false; }
+  });
 
   /* ---------- พิมพ์ ---------- */
   function grow(f){ f.style.height = 'auto'; f.style.height = f.scrollHeight + 'px'; }
