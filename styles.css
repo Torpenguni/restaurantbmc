@@ -587,3 +587,66 @@ dialog.ask .btn{padding:10px 17px;font-size:14.5px}
   .mini,.seg-actions,.stars button{display:none}
   .review,.calc{break-inside:avoid;box-shadow:none}
 }
+
+/* ---------- ปุ่มขอความช่วยเหลือรายช่อง ---------- */
+.askai{
+  font:inherit;font-size:11.5px;font-weight:600;cursor:pointer;
+  border:1px solid var(--line-2);background:var(--surface);color:var(--ink-mute);
+  border-radius:20px;padding:3px 10px;margin-top:8px;align-self:flex-start;
+  display:inline-flex;align-items:center;gap:5px;
+}
+.askai:hover{border-color:var(--accent);color:var(--accent)}
+.askai[disabled]{opacity:.55;cursor:progress}
+.aires{
+  margin-top:9px;border:1px solid var(--accent-line);background:var(--accent-soft);
+  border-radius:var(--r-sm);padding:10px 11px;font-size:12.5px;line-height:1.6;
+}
+.aires .q{margin:0 0 5px;padding-left:15px;position:relative;color:var(--ink)}
+.aires .q::before{content:'?';position:absolute;left:0;font-weight:700;color:var(--accent)}
+.aires .fx{margin:0 0 8px;color:var(--ink-2)}
+.aires .dr{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);
+  padding:8px 10px;margin:0 0 8px;color:var(--ink);
+}
+.aires .acts{display:flex;gap:6px;flex-wrap:wrap}
+.aires .acts button{
+  font:inherit;font-size:11.5px;font-weight:600;cursor:pointer;border-radius:20px;
+  padding:3px 10px;border:1px solid var(--line-2);background:var(--surface);color:var(--ink);
+}
+.aires .acts button.use{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.aires .acts button:hover{opacity:.85}
+@media print{ .askai,.aires{display:none} }
+
+/* ---------- คำอธิบายและตัวช่วยคิด เก็บไว้ใต้ปุ่มกด ----------
+   เดิมทุกช่องแสดงคำอธิบาย คำถามชวนคิด และลิงก์บทความพร้อมกันหมด
+   ทำให้ช่องหนึ่งยาวจนมองไม่เห็นช่องอื่น และแย่งพื้นที่ช่องพิมพ์
+   ตอนนี้ซ่อนไว้ ใครอยากอ่านค่อยกด ------------------------------ */
+.ex{margin:0 0 8px}
+.ex > summary{
+  list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:5px;
+  font-size:11.5px;font-weight:600;color:var(--ink-mute);
+  border:1px solid var(--line-2);background:var(--surface);
+  border-radius:20px;padding:2px 10px;user-select:none;
+}
+.ex > summary::-webkit-details-marker{display:none}
+.ex > summary::after{content:'▾';font-size:9px;opacity:.7}
+.ex[open] > summary::after{content:'▴'}
+.ex > summary:hover{border-color:var(--ink-faint);color:var(--ink)}
+.ex[open] > summary{color:var(--ink);border-color:var(--ink-faint)}
+.ex .hint,.ex .ask,.ex .rd{margin-top:7px}
+.coach .ex{margin-bottom:0}
+.coach{border-top:0;padding-top:0;margin-top:8px;display:flex;flex-direction:column;gap:7px;align-items:flex-start}
+.askai{margin-top:0}
+
+/* ช่องพิมพ์ใหญ่ขึ้น เพราะได้พื้นที่คืนจากการยุบคำอธิบาย
+   ใส่ max-height ด้วย เพราะ textarea เป็น flex:1 ถ้าไม่จำกัด
+   ช่องที่เนื้อหาน้อยจะถูกยืดตามช่องที่สูงที่สุดในแถวเดียวกัน
+   กลายเป็นกล่องเปล่าสูงเกือบ 500px */
+.fill .f{min-height:268px}
+.fill .f textarea{min-height:150px;max-height:300px;font-size:14.5px}
+.fill .vpseg textarea{min-height:74px}
+@media (max-width:900px){
+  .fill .f{min-height:236px}
+  .fill .f textarea{min-height:128px}
+}
+@media print{ .ex > summary{display:none} .ex[open] .hint{display:none} }

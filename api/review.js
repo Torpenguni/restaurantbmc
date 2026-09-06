@@ -14,7 +14,7 @@ const MAX_OUTPUT = 2400;    // เพดาน token ขาออก กัน�
                             // ไทยกิน token ต่อตัวอักษรมากกว่าอังกฤษหลายเท่า
                             // 1200 ทำให้คำตอบ 5 ข้อถูกตัดกลางจน JSON ไม่ปิด
 const WINDOW_MS  = 60000;
-const PER_WINDOW = 4;
+const PER_WINDOW = 12;   // ปุ่มรายช่องมี 9 ปุ่ม คนกรอกจะกดถี่กว่าปุ่มรวม
 
 /* ตัวจำกัดอัตราแบบง่าย เก็บในหน่วยความจำของ instance
    serverless สร้าง instance ใหม่ได้เรื่อย ๆ อันนี้จึงเป็นลูกระนาด
@@ -55,6 +55,23 @@ const SYSTEM = `คุณคือที่ปรึกษาธุรกิจ�
 ตอบเป็น JSON เท่านั้น ห้ามมีข้อความอื่นนอก JSON
 {"items":[{"block":"cs|vp|ch|cr|rs|kr|ka|kp|co|all","level":"urgent|should|option","title":"ประโยคเดียวว่าปัญหาคืออะไร","note":"อธิบายและบอกว่าให้ทำอะไรต่อ"}]}`;
 
+
+const SYSTEM_BLOCK = `คุณคือที่ปรึกษาธุรกิจร้านอาหารในไทย เจ้าของร้านกำลังกรอก Business Model Canvas อยู่ช่องหนึ่ง และกดขอความช่วยเหลือเฉพาะช่องนั้น
+
+คุณจะได้รับ ชื่อช่อง · มาตรฐานของช่องนั้น · หลุมพรางที่พบบ่อย · สิ่งที่เขาเขียนไว้ตอนนี้ · และบริบทกลุ่มลูกค้า
+
+วิธีตอบ
+- ภาษาไทย พูดกับเจ้าของร้านตรง ๆ ไม่ใช้ศัพท์ที่ปรึกษา
+- ask: คำถาม 1-2 ข้อที่ทำให้คำตอบเขาคมขึ้น ถามสิ่งที่ยังไม่มีในคำตอบเท่านั้น ห้ามถามสิ่งที่เขาตอบไปแล้ว
+- fix: ชี้จุดที่ยังอ่อนของสิ่งที่เขาเขียน 1 ประโยค ถ้าเขียนดีอยู่แล้วให้บอกว่าดีตรงไหนและต่อยอดยังไง
+- draft: ตัวอย่างข้อความที่เขาเอาไปใช้ได้เลย เขียนในน้ำเสียงเจ้าของร้าน ไม่เกิน 2 บรรทัด
+  ต้องอ้างอิงบริบทกลุ่มลูกค้าที่ได้รับ ห้ามเขียนกว้าง ๆ ที่ใช้กับร้านไหนก็ได้
+  ถ้าช่องยังว่าง ให้ร่างจากบริบทกลุ่มลูกค้า ถ้ามีข้อความแล้วให้เขียนเวอร์ชันที่คมขึ้น
+- ถ้าข้อมูลไม่พอจะร่าง ให้ draft เป็นค่าว่าง แล้วบอกใน fix ว่าขาดอะไร
+
+ตอบเป็น JSON เท่านั้น
+{"ask":["คำถามที่ 1","คำถามที่ 2"],"fix":"ประโยคเดียว","draft":"ข้อความที่เอาไปใช้ได้"}`;
+
 module.exports = async (req, res) => {
   res.setHeader('Cache-Control', 'no-store');
 
@@ -76,8 +93,11 @@ module.exports = async (req, res) => {
   if (!body || typeof body.canvas !== 'string')
     return res.status(400).json({ error: 'bad-body' });
 
+  const isBlock = body.mode === 'block';
   const canvas = body.canvas.slice(0, MAX_BODY);
-  if (canvas.trim().length < 60)
+  // โหมดรายช่องส่งข้อมูลน้อยกว่ามาก เกณฑ์ความยาวขั้นต่ำจึงต้องต่ำกว่า
+  // ไม่งั้นกดขอความช่วยเหลือตอนช่องยังว่างไม่ได้ ซึ่งเป็นตอนที่ต้องการที่สุด
+  if (canvas.trim().length < (isBlock ? 12 : 60))
     return res.status(400).json({ error: 'too-short' });
 
   try {
@@ -90,8 +110,8 @@ module.exports = async (req, res) => {
       },
       body: JSON.stringify({
         model: MODEL,
-        max_tokens: MAX_OUTPUT,
-        system: SYSTEM,
+        max_tokens: isBlock ? 700 : MAX_OUTPUT,
+        system: isBlock ? SYSTEM_BLOCK : SYSTEM,
         // prefill ด้วย { บังคับให้โมเดลต่อ JSON เลย
         // ไม่งั้นบางครั้งมันใส่ ```json ครอบ หรือเกริ่นก่อน แล้วแปลงไม่ได้
         messages: [
@@ -129,6 +149,15 @@ module.exports = async (req, res) => {
         error: data.stop_reason === 'max_tokens' ? 'truncated' : 'parse',
         stop: data.stop_reason || null
       });
+    if (isBlock) {
+      return res.status(200).json({
+        ask: (Array.isArray(out.ask) ? out.ask : []).slice(0, 2).map(x => String(x).slice(0, 180)),
+        fix: String(out.fix || '').slice(0, 400),
+        draft: String(out.draft || '').slice(0, 400),
+        model: MODEL
+      });
+    }
+
     const items = Array.isArray(out.items) ? out.items.slice(0, 4) : [];
 
     return res.status(200).json({
