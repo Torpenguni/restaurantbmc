@@ -22,15 +22,31 @@
   --ink-2:#2b303a;
   --ink-mute:#5f6775;
   --ink-faint:#8a919e;
-  --accent:#14171c;
+  --accent:#0b6b52;          /* เขียวมรกต = สีหลักของแบรนด์ ใช้กับปุ่มและสถานะที่กำลังทำอยู่ */
+  --accent-2:#095643;
   --accent-ink:#ffffff;
-  --ok:#0f6b52;
-  --ok-bg:#e6f4ef;
-  --warn:#9a5b06;
-  --warn-bg:#fdf3e3;
-  --bad:#a8231b;
-  --bad-bg:#fdeceb;
-  --focus:#2563eb;
+  --accent-soft:#e3f2ec;
+  --accent-line:#a8d8c7;
+
+  /* canvas แบ่งสีตาม 4 กลุ่มหน้าที่ ตามแบบที่ใช้กันเป็นมาตรฐาน
+     ฟ้า = เครื่องจักรหลังบ้าน · ส้ม = คุณค่า (ใจกลาง)
+     เหลือง = ฝั่งลูกค้า · เขียว = แถวเงิน
+     คนที่เคยเห็น canvas มาก่อนจะอ่านโครงออกทันทีโดยไม่ต้องอ่านตัวหนังสือ */
+  --g-ops-bg:#e7f0f9;  --g-ops:#1a5a8f;  --g-ops-line:#bcd7ee;
+  --g-val-bg:#fbe7d8;  --g-val:#ad4a1b;  --g-val-line:#f0c3a3;
+  --g-cus-bg:#fcf1d8;  --g-cus:#8f6008;  --g-cus-line:#eeda9f;
+  --g-mon-bg:#dcf0e6;  --g-mon:#0b6b52;  --g-mon-line:#a9d9c3;
+
+  --ok:#0b6b52;
+  --ok-bg:#dcf0e8;
+  --ok-line:#8fcdb8;
+  --warn:#a35a00;
+  --warn-bg:#fdf0dc;
+  --warn-line:#f0cf9a;
+  --bad:#b3251c;
+  --bad-bg:#fdeae8;
+  --bad-line:#f3b6b0;
+  --focus:#1d4ed8;
   --shadow-sm:0 1px 2px rgba(20,23,28,.05);
   --shadow:0 1px 3px rgba(20,23,28,.07),0 8px 24px -12px rgba(20,23,28,.14);
   --shadow-lg:0 24px 60px -20px rgba(20,23,28,.3);
@@ -51,14 +67,26 @@
     --ink-2:#d3d7de;
     --ink-mute:#98a0ad;
     --ink-faint:#6d7482;
-    --accent:#eceef2;
-    --accent-ink:#14171c;
-    --ok:#4cc09b;
-    --ok-bg:#123227;
-    --warn:#e3a94e;
-    --warn-bg:#33260f;
-    --bad:#f08b83;
-    --bad-bg:#39191a;
+    --accent:#2f9e7c;
+    --accent-2:#3cb590;
+    --accent-ink:#06120e;
+    --accent-soft:#10261f;
+    --accent-line:#1e4638;
+
+    --g-ops-bg:#111f2c;  --g-ops:#7fb8e6;  --g-ops-line:#1f3a52;
+    --g-val-bg:#2a1911;  --g-val:#e8a077;  --g-val-line:#4a2c1c;
+    --g-cus-bg:#282010;  --g-cus:#e2c069;  --g-cus-line:#463819;
+    --g-mon-bg:#0f281f;  --g-mon:#4fc79f;  --g-mon-line:#1d4a3a;
+
+    --ok:#3cb590;
+    --ok-bg:#0f2a21;
+    --ok-line:#1f5644;
+    --warn:#e0a44e;
+    --warn-bg:#2e2411;
+    --warn-line:#54401c;
+    --bad:#f28b82;
+    --bad-bg:#33191a;
+    --bad-line:#5c2b28;
     --focus:#5b8def;
     --shadow-sm:0 1px 2px rgba(0,0,0,.4);
     --shadow:0 1px 3px rgba(0,0,0,.5),0 8px 24px -12px rgba(0,0,0,.7);
@@ -94,7 +122,7 @@ a{color:inherit}
   font-weight:700;font-size:16.5px;text-decoration:none;letter-spacing:-.015em;
   display:inline-flex;align-items:center;gap:1px;
 }
-.brand span{color:var(--ink-mute);font-weight:600}
+.brand span{color:var(--accent);font-weight:700}
 .top nav{margin-left:auto;display:flex;gap:2px;align-items:center;flex-wrap:wrap}
 .top nav a{
   text-decoration:none;font-size:14px;font-weight:500;color:var(--ink-mute);
@@ -104,7 +132,7 @@ a{color:inherit}
 .top nav a.cta{
   background:var(--accent);color:var(--accent-ink);font-weight:600;margin-left:6px;
 }
-.top nav a.cta:hover{opacity:.86;background:var(--accent)}
+.top nav a.cta:hover{background:var(--accent-2)}
 
 /* ---------- ปุ่ม ---------- */
 .btn,.mini{
@@ -118,9 +146,9 @@ a{color:inherit}
 .mini:hover{background:var(--surface-3)}
 .mini[disabled]{opacity:.4;cursor:not-allowed}
 .btn-solid{background:var(--accent);color:var(--accent-ink)}
-.btn-solid:hover{opacity:.86}
+.btn-solid:hover{background:var(--accent-2)}
 .btn-note{background:var(--accent);color:var(--accent-ink)}
-.btn-note:hover{opacity:.86}
+.btn-note:hover{background:var(--accent-2)}
 .btn-plain{background:var(--surface);color:var(--ink);border-color:var(--line-2)}
 .btn-plain:hover{background:var(--surface-3)}
 .btn.danger{background:var(--bad);border-color:var(--bad);color:#fff}
@@ -143,7 +171,7 @@ h1{
   font-size:clamp(34px,5vw,54px);line-height:1.16;font-weight:700;
   letter-spacing:-.025em;margin:0 0 20px;max-width:17ch;text-wrap:balance;
 }
-h1 em{font-style:normal;color:var(--ink-mute)}
+h1 em{font-style:normal;color:var(--accent)}
 .lede{font-size:clamp(16.5px,1.7vw,19px);line-height:1.65;max-width:60ch;color:var(--ink-mute);margin:0 0 30px}
 .hero-actions{display:flex;gap:10px;flex-wrap:wrap}
 
@@ -167,11 +195,10 @@ p{margin:0 0 15px;max-width:68ch}
 .cell .n{font-size:11px;font-weight:700;color:var(--ink-faint);letter-spacing:.09em;margin-bottom:7px}
 .cell h4{font-size:15px;font-weight:700;margin:0 0 5px;line-height:1.35}
 .cell .q{font-size:13.5px;line-height:1.55;color:var(--ink-mute);margin:0}
-.cell.hl{background:var(--surface-3)}
-.cell.hl .n{color:var(--ink-mute)}
 .c-kp{grid-area:kp}.c-ka{grid-area:ka}.c-kr{grid-area:kr}.c-vp{grid-area:vp}
 .c-cr{grid-area:cr}.c-ch{grid-area:ch}.c-cs{grid-area:cs}.c-co{grid-area:co}.c-rs{grid-area:rs}
 .canvas-note{font-size:13.5px;color:var(--ink-mute);margin:0}
+
 
 /* ---------- การ์ด 9 ช่องแบบอธิบาย ---------- */
 .blocks{
@@ -182,7 +209,7 @@ p{margin:0 0 15px;max-width:68ch}
 .block{background:var(--surface);padding:22px 20px}
 .block .n{
   display:inline-block;font-size:11px;font-weight:700;letter-spacing:.07em;
-  color:var(--ink-mute);background:var(--surface-3);padding:2px 8px;border-radius:20px;margin-bottom:10px;
+  color:var(--accent);background:var(--accent-soft);padding:2px 9px;border-radius:20px;margin-bottom:10px;
 }
 .block ul{margin:9px 0 0;padding-left:18px}
 .block li{margin-bottom:6px;font-size:14.5px;line-height:1.6;color:var(--ink-mute)}
@@ -193,9 +220,9 @@ p{margin:0 0 15px;max-width:68ch}
   border:1px solid var(--line);border-radius:var(--r);background:var(--surface);
   margin-top:22px;overflow:hidden;box-shadow:var(--shadow-sm);
 }
-.eg-head{padding:18px 20px;border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:baseline;flex-wrap:wrap;background:var(--surface-2)}
+.eg-head{padding:18px 20px;border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:baseline;flex-wrap:wrap;background:var(--accent-soft)}
 .eg-head h3{margin:0}
-.eg-tag{font-size:12px;font-weight:600;background:var(--surface-3);color:var(--ink-mute);padding:3px 9px;border-radius:20px}
+.eg-tag{font-size:12px;font-weight:600;background:var(--accent);color:var(--accent-ink);padding:3px 9px;border-radius:20px}
 .eg-body{padding:4px 20px 16px}
 .eg-row{display:grid;grid-template-columns:184px 1fr;gap:14px;padding:12px 0;border-bottom:1px solid var(--line)}
 .eg-row:last-child{border-bottom:0}
@@ -250,7 +277,7 @@ footer a:hover{text-decoration:underline}
 }
 .stepper a:hover{border-color:var(--line-2);color:var(--ink)}
 .stepper a .tick{color:var(--ok);font-weight:700}
-.stepper a.done{border-color:color-mix(in srgb,var(--ok) 42%,var(--line));color:var(--ink)}
+.stepper a.done{border-color:var(--ok-line);background:var(--ok-bg);color:var(--ink)}
 .stepper a.now{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 
 @media (min-width:1180px){
@@ -259,9 +286,13 @@ footer a:hover{text-decoration:underline}
     border-right:1px solid var(--line);border-bottom:0;padding:22px 0;overflow-y:auto;
   }
   .stepper .wrap{flex-direction:column;align-items:stretch;gap:4px;padding:0 16px;max-width:none;overflow:visible}
-  .stepper a{border:0;background:transparent;border-radius:var(--r-sm);padding:9px 12px;white-space:normal}
+  .stepper a{
+    border:0;background:transparent;border-radius:var(--r-sm);
+    padding:9px 12px 9px 14px;white-space:normal;border-left:3px solid transparent;
+  }
   .stepper a:hover{background:var(--surface-3)}
-  .stepper a.done{border:0;background:transparent}
+  .stepper a.done{border:0;border-left:3px solid var(--ok);background:var(--ok-bg);color:var(--ink)}
+  .stepper a.now{border-left:3px solid var(--accent)}
   /* รางอยู่ใต้แถบบน แถบบนต้องเต็มความกว้าง จึงเลื่อนเฉพาะเนื้อหา
      ไม่ใช่เลื่อนทั้ง body ไม่งั้นแถบบนกับฟุตเตอร์ถูกดันตามไปด้วย */
   body.tool > .wrap,
@@ -312,7 +343,7 @@ table.stp thead th input{font-weight:600}
 table.stp input::placeholder{color:var(--ink-faint)}
 table.stp input:focus{outline:none;background:color-mix(in srgb,var(--focus) 8%,transparent);box-shadow:inset 0 0 0 1px var(--focus)}
 table.stp td.tot{padding:11px 13px;font-weight:700;font-variant-numeric:tabular-nums;font-size:14.5px}
-table.stp td.win{background:var(--ok-bg);color:var(--ok)}
+table.stp td.win{background:var(--ok-bg);color:var(--ok);box-shadow:inset 0 -3px 0 var(--ok)}
 .scrollhint{font-size:12.5px;color:var(--ink-faint);margin:8px 0 0;display:none}
 @media (max-width:760px){ .scrollhint{display:block} }
 
@@ -322,8 +353,8 @@ table.stp td.win{background:var(--ok-bg);color:var(--ok)}
   border:0;background:transparent;cursor:pointer;font-size:16px;line-height:1;
   padding:1px 2px;color:var(--line-2);border-radius:3px;
 }
-.stars button.on{color:var(--warn)}
-.stars button:hover{color:var(--warn)}
+.stars button.on{color:#e8a33d}
+.stars button:hover{color:#e8a33d}
 
 /* ---------- ตาราง 9 ช่องสำหรับกรอก ---------- */
 .fill{
@@ -347,7 +378,6 @@ table.stp td.win{background:var(--ok-bg);color:var(--ok)}
 }
 .f textarea::placeholder{color:var(--ink-faint)}
 .f textarea:focus{outline:none;border-color:var(--focus);background:var(--surface);box-shadow:0 0 0 3px color-mix(in srgb,var(--focus) 15%,transparent)}
-.f.key{background:var(--surface-2)}
 
 /* คุณค่า แยกกล่องต่อกลุ่มลูกค้า */
 .vpseg{margin-bottom:9px}
@@ -391,11 +421,11 @@ table.stp td.win{background:var(--ok-bg);color:var(--ok)}
 .nf input:focus{outline:none;border-bottom-color:var(--focus);border-bottom-width:2px}
 
 .calc{
-  border:1px solid var(--line);border-top:0;border-radius:0 0 var(--r) var(--r);
-  background:var(--surface-2);padding:20px;box-shadow:var(--shadow-sm);
+  border:1px solid var(--accent-line);border-top:0;border-radius:0 0 var(--r) var(--r);
+  background:var(--accent-soft);padding:20px;box-shadow:var(--shadow-sm);
 }
-.calc.empty{color:var(--ink-mute)}
-.calc .big{
+.calc.empty{background:var(--surface-2);border-color:var(--line);color:var(--ink-mute)}
+.calc .big{color:var(--accent);
   font-size:clamp(21px,3vw,29px);font-weight:700;line-height:1.3;margin:0 0 6px;
   letter-spacing:-.02em;font-variant-numeric:tabular-nums;
 }
@@ -418,9 +448,9 @@ table.stp td.win{background:var(--ok-bg);color:var(--ok)}
   padding:3px 9px;border-radius:20px;background:var(--surface-3);color:var(--ink-mute);
   white-space:nowrap;margin-top:2px;
 }
-.rv.warn-x{background:var(--bad-bg)}
+.rv.warn-x{background:var(--bad-bg);box-shadow:inset 3px 0 0 var(--bad)}
 .rv.warn-x .tag{background:var(--bad);color:#fff}
-.rv.good{background:var(--ok-bg)}
+.rv.good{background:var(--ok-bg);box-shadow:inset 3px 0 0 var(--ok)}
 .rv.good .tag{background:var(--ok);color:#fff}
 .rv.ai-item .tag{background:var(--accent);color:var(--accent-ink)}
 .rv.ai-item.warn-x .tag{background:var(--bad);color:#fff}
@@ -473,6 +503,45 @@ dialog.ask h3{margin:0 0 8px;font-size:18px;line-height:1.4}
 dialog.ask p{margin:0;font-size:14.5px;line-height:1.68;color:var(--ink-mute);max-width:none}
 dialog.ask .ft{display:flex;gap:9px;justify-content:flex-end;padding:20px 22px 20px;flex-wrap:wrap}
 dialog.ask .btn{padding:10px 17px;font-size:14.5px}
+
+
+/* ============================================================
+   สี 4 กลุ่มของ canvas
+
+   ฟ้า = เครื่องจักรหลังบ้าน (พันธมิตร กิจกรรม ทรัพยากร)
+   ส้ม = คุณค่า ซึ่งอยู่ใจกลาง
+   เหลือง = ฝั่งลูกค้า (ความสัมพันธ์ ช่องทาง กลุ่มลูกค้า)
+   เขียว = แถวเงิน (ต้นทุน รายได้)
+
+   เป็นชุดสีที่ใช้กันเป็นมาตรฐานกับ canvas นี้ คนที่เคยเห็นมาก่อน
+   จะอ่านโครงออกทันทีโดยไม่ต้องอ่านตัวหนังสือ
+
+   ต้องเขียนซ้อนใต้ .canvas/.fill เพราะกฎพื้นฐานของ .cell กับ .f
+   ประกาศ background ไว้ทีหลัง ถ้าไม่เพิ่มความเจาะจงจะโดนทับ
+   ============================================================ */
+.canvas .c-kp,.canvas .c-ka,.canvas .c-kr,
+.fill .c-kp,.fill .c-ka,.fill .c-kr{background:var(--g-ops-bg)}
+.canvas .c-vp,.fill .c-vp{background:var(--g-val-bg)}
+.canvas .c-cr,.canvas .c-ch,.canvas .c-cs,
+.fill .c-cr,.fill .c-ch,.fill .c-cs{background:var(--g-cus-bg)}
+.canvas .c-co,.canvas .c-rs,.fill .c-co,.fill .c-rs{background:var(--g-mon-bg)}
+
+.canvas .cell .n,.fill .f .n{font-weight:700}
+.c-kp .n,.c-ka .n,.c-kr .n,.c-kp label,.c-ka label,.c-kr label,
+.c-kp h4,.c-ka h4,.c-kr h4{color:var(--g-ops)}
+.c-vp .n,.c-vp label,.c-vp h4{color:var(--g-val)}
+.c-cr .n,.c-ch .n,.c-cs .n,.c-cr label,.c-ch label,.c-cs label,
+.c-cr h4,.c-ch h4,.c-cs h4{color:var(--g-cus)}
+.c-co .n,.c-rs .n,.c-co label,.c-rs label,.c-co h4,.c-rs h4{color:var(--g-mon)}
+
+/* คุณค่ากับกลุ่มลูกค้าคือสองช่องที่ต้องตอบให้ได้ก่อน คาดแถบไว้ให้เห็น */
+.canvas .c-vp.hl,.fill .c-vp.key{box-shadow:inset 0 3px 0 var(--g-val)}
+.canvas .c-cs.hl,.fill .c-cs.key{box-shadow:inset 0 3px 0 var(--g-cus)}
+
+/* ช่องพิมพ์อยู่บนพื้นขาวเสมอ จะได้อ่านสิ่งที่ตัวเองพิมพ์สบายตา */
+.fill .f textarea,.fill .vpseg textarea{background:var(--surface)}
+.fill .f textarea:focus,.fill .vpseg textarea:focus{background:var(--surface)}
+.fill .f .hint,.fill .f .coach .ask{color:var(--ink-mute)}
 
 /* ---------- จอแคบ ---------- */
 @media (max-width:900px){

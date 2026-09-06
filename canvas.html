@@ -12,73 +12,6 @@
 <link rel="canonical" href="https://restaurantbmc.vercel.app/canvas.html">
 <meta property="og:url" content="https://restaurantbmc.vercel.app/canvas.html">
 <meta name="robots" content="index, follow">
-<style>
-/* ---------- เฉพาะหน้ากรอก ---------- */
-.tool-head{padding:32px 0 22px;border-bottom:2px solid var(--rule)}
-.tool-head h1{font-size:clamp(26px,3.6vw,38px);max-width:none;margin-bottom:10px}
-.shopname{
-  font:inherit;font-size:19px;font-weight:600;
-  border:none;border-bottom:2px solid var(--rule);background:transparent;
-  padding:5px 2px;width:min(420px,100%);color:var(--ink);
-}
-.shopname::placeholder{color:#b3b1a6;font-weight:400}
-.shopname:focus{outline:none;background:var(--note)}
-
-.bar{
-  display:flex;gap:10px;flex-wrap:wrap;align-items:center;
-  padding:16px 0;border-bottom:2px solid var(--rule);
-  position:sticky;top:62px;background:var(--paper);z-index:40;
-}
-.bar .btn{padding:10px 17px;font-size:15px}
-.status{font-size:14px;color:var(--ink-mute);margin-left:auto}
-
-.fill{
-  display:grid;gap:2px;background:var(--rule);
-  border:2px solid var(--rule);margin:26px 0 10px;
-  grid-template-columns:repeat(10,1fr);
-  grid-template-areas:
-    "kp kp ka ka vp vp cr cr cs cs"
-    "kp kp kr kr vp vp ch ch cs cs"
-    "co co co co co rs rs rs rs rs";
-}
-.f{background:var(--paper-2);padding:13px 13px 11px;display:flex;flex-direction:column;min-height:210px}
-.f .n{font-size:11px;font-weight:700;color:var(--ink-mute);letter-spacing:0.1em}
-.f label{font-size:15px;font-weight:700;margin:2px 0 3px;display:block;line-height:1.35}
-.f .hint{font-size:12.5px;color:var(--ink-mute);line-height:1.5;margin:0 0 8px}
-.f textarea{
-  flex:1;width:100%;resize:vertical;min-height:96px;
-  font:inherit;font-size:14.5px;line-height:1.65;color:var(--ink);
-  border:1px dashed var(--rule-soft);border-radius:4px;
-  background:transparent;padding:9px 10px;
-}
-.f textarea:focus{outline:none;border-color:var(--rule);border-style:solid;background:#fffdf2}
-.f.key{background:var(--note)}
-.f.key .n,.f.key .hint{color:#5a4a00}
-.f.key textarea{border-color:#d7b400;background:rgba(255,255,255,.55)}
-.f.key textarea:focus{background:#fff}
-
-.tip{font-size:14px;color:var(--ink-mute);margin:0 0 34px}
-
-/* ---------- ตอนสั่งพิมพ์ ---------- */
-@media print{
-  @page{size:A4 landscape;margin:9mm}
-  .top,.bar,.tip,footer,.noprint{display:none !important}
-  body{background:#fff;font-size:10pt}
-  .tool-head{padding:0 0 8px;border-bottom:1.5pt solid #000}
-  .tool-head h1{font-size:15pt;margin:0 0 4px}
-  .shopname{border-bottom:1pt solid #000;font-size:13pt}
-  .wrap{padding:0;max-width:none}
-  .fill{margin:8px 0 0;border-width:1.5pt;gap:1.5pt;background:#000}
-  .f{min-height:0;padding:6px 7px}
-  .f label{font-size:9.5pt;margin:0}
-  .f .hint{display:none}
-  .f textarea{
-    border:0;padding:2px 0;min-height:0;height:auto;font-size:9pt;line-height:1.45;
-    background:transparent;overflow:visible;
-  }
-  .f.key{background:#f4f4f0 !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-}
-</style>
 </head>
 <body class="tool">
 
@@ -688,8 +621,16 @@
     n = n || 3;
     // เอาบทความที่ตรงคำก่อน ถ้ายังไม่ครบจำนวน ค่อยเติมจากบทความในช่องเดียวกัน
     var hit = pool.filter(function(it){ return it._r >= 2; }).slice(0, n);
-    if (hit.length < n)
-      hit = hit.concat(pool.filter(function(it){ return hit.indexOf(it) < 0; }).slice(0, n - hit.length));
+    if (hit.length < n) {
+      // ไม่มีคำตรงเลย ถ้าหยิบตัวแรกของ pool ทุกช่อง บทความเดียวกันจะโผล่ซ้ำทั้งหน้า
+      // ขยับจุดเริ่มตามชื่อช่อง เพื่อให้แต่ละช่องได้คนละชุด
+      var seed = 0;
+      for (var c = 0; c < block.length; c++) seed += block.charCodeAt(c);
+      var rest = pool.filter(function(it){ return hit.indexOf(it) < 0; });
+      var off = rest.length ? seed % rest.length : 0;
+      for (var k = 0; k < rest.length && hit.length < n; k++)
+        hit.push(rest[(off + k) % rest.length]);
+    }
     return hit;
   }
 
