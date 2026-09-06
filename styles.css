@@ -1,0 +1,156 @@
+/* ============================================================
+   ผังธุรกิจร้านอาหาร — Business Model Canvas
+
+   งานนี้คือใบงาน ไม่ใช่เว็บโฆษณา หน้าตาจึงอิงของจริงที่คนใช้กัน
+   คือกระดาษแผ่นใหญ่กับกระดาษโน้ตสีเหลืองแปะทับ ไม่ใช่ธีมมืดแบบ
+   เว็บเอเจนซี่ สีเหลืองใช้เฉพาะจุดที่ต้องการให้ลงมือ ที่เหลือ
+   เป็นหมึกดำบนกระดาษเพื่อให้พิมพ์ออกมาแล้วยังอ่านรู้เรื่อง
+   ============================================================ */
+:root{
+  --paper:#faf9f5;
+  --paper-2:#ffffff;
+  --rule:#141410;          /* เส้นตารางหนา เหมือนเส้นที่ตีบนกระดาษจริง */
+  --rule-soft:#d9d7cd;
+  --ink:#141410;
+  --ink-mute:#6b6a5f;
+  --note:#ffd84d;          /* สีกระดาษโน้ต ใช้เป็นสีเน้นทั้งเว็บ */
+  --note-deep:#e8b800;
+  --green:#12513f;
+  --maxw:1180px;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:'Anuphan',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  font-size:17px;line-height:1.75;
+  letter-spacing:0;                     /* ไทยมีสระบนล่าง บีบระยะแล้วชนกัน */
+  -webkit-font-smoothing:antialiased;
+}
+img{max-width:100%;display:block}
+a{color:inherit}
+
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+
+/* ---------- แถบบน ---------- */
+.top{
+  position:sticky;top:0;z-index:50;
+  background:var(--paper);border-bottom:2px solid var(--rule);
+}
+.top .wrap{display:flex;align-items:center;gap:16px;min-height:62px}
+.brand{font-weight:700;font-size:19px;text-decoration:none;letter-spacing:-0.01em}
+.brand span{background:var(--note);padding:0 6px;border-radius:3px}
+.top nav{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+.top nav a{
+  text-decoration:none;font-size:15px;font-weight:500;
+  padding:8px 14px;border:1.5px solid transparent;border-radius:999px;
+}
+.top nav a:hover{border-color:var(--rule-soft)}
+.top nav a.cta{background:var(--rule);color:var(--paper);font-weight:600}
+.top nav a.cta:hover{background:var(--green);border-color:var(--green)}
+
+/* ---------- หัวเรื่อง ---------- */
+.hero{padding:64px 0 40px;border-bottom:2px solid var(--rule)}
+.eyebrow{
+  font-size:13px;font-weight:600;letter-spacing:0.14em;
+  text-transform:uppercase;color:var(--ink-mute);margin:0 0 18px;
+}
+h1{
+  font-size:clamp(32px,5.2vw,58px);line-height:1.25;font-weight:700;
+  margin:0 0 22px;max-width:16ch;text-wrap:balance;
+}
+h1 em{font-style:normal;background:var(--note);padding:0 8px;border-radius:4px}
+.lede{font-size:clamp(17px,2vw,20px);max-width:62ch;color:var(--ink-mute);margin:0 0 30px}
+.hero-actions{display:flex;gap:12px;flex-wrap:wrap}
+.btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:14px 22px;border-radius:999px;text-decoration:none;
+  font-weight:600;font-size:16px;border:2px solid var(--rule);
+}
+.btn-solid{background:var(--rule);color:var(--paper)}
+.btn-solid:hover{background:var(--green);border-color:var(--green)}
+.btn-note{background:var(--note);color:var(--ink)}
+.btn-note:hover{background:var(--note-deep)}
+.btn-plain:hover{background:#efeee7}
+
+/* ---------- ส่วนเนื้อหา ---------- */
+section{padding:56px 0;border-bottom:2px solid var(--rule)}
+.sec-num{
+  font-size:13px;font-weight:600;letter-spacing:0.14em;color:var(--ink-mute);
+  margin:0 0 12px;text-transform:uppercase;
+}
+h2{font-size:clamp(25px,3.4vw,36px);line-height:1.3;font-weight:700;margin:0 0 16px;max-width:22ch;text-wrap:balance}
+h3{font-size:20px;font-weight:600;margin:0 0 8px;line-height:1.4}
+p{margin:0 0 16px;max-width:68ch}
+.muted{color:var(--ink-mute)}
+
+/* ---------- ตาราง canvas 9 ช่อง ---------- */
+.canvas{
+  display:grid;gap:2px;background:var(--rule);
+  border:2px solid var(--rule);margin:28px 0 8px;
+  grid-template-columns:repeat(10,1fr);
+  grid-template-areas:
+    "kp kp ka ka vp vp cr cr cs cs"
+    "kp kp kr kr vp vp ch ch cs cs"
+    "co co co co co rs rs rs rs rs";
+}
+.cell{background:var(--paper-2);padding:16px 15px;min-height:150px;display:flex;flex-direction:column}
+.cell .n{font-size:12px;font-weight:700;color:var(--ink-mute);letter-spacing:0.1em;margin-bottom:6px}
+.cell h4{font-size:16px;font-weight:700;margin:0 0 6px;line-height:1.35}
+.cell .q{font-size:14px;line-height:1.6;color:var(--ink-mute);margin:0}
+.cell.hl{background:var(--note)}
+.cell.hl .n,.cell.hl .q{color:#5a4a00}
+.c-kp{grid-area:kp} .c-ka{grid-area:ka} .c-kr{grid-area:kr} .c-vp{grid-area:vp}
+.c-cr{grid-area:cr} .c-ch{grid-area:ch} .c-cs{grid-area:cs}
+.c-co{grid-area:co} .c-rs{grid-area:rs}
+.canvas-note{font-size:14px;color:var(--ink-mute);margin:0}
+
+/* ---------- รายการ 9 ช่องแบบอธิบายยาว ---------- */
+.blocks{display:grid;
+  /* min(300px,100%) ไม่ใช่ 300px เฉย ๆ ไม่งั้นคอลัมน์ย่อต่ำกว่า 300
+     ไม่ได้ แล้วดันหน้าจนล้นบนจอ 320px */
+  grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:2px;background:var(--rule);border:2px solid var(--rule);margin-top:28px}
+.block{background:var(--paper-2);padding:24px 22px}
+.block .n{
+  display:inline-block;font-size:13px;font-weight:700;
+  background:var(--note);padding:1px 8px;border-radius:3px;margin-bottom:10px;
+}
+.block ul{margin:10px 0 0;padding-left:19px}
+.block li{margin-bottom:7px;font-size:15px;line-height:1.65;color:var(--ink-mute)}
+.block li strong{color:var(--ink);font-weight:600}
+
+/* ---------- ตัวอย่าง ---------- */
+.eg{border:2px solid var(--rule);background:var(--paper-2);margin-top:26px}
+.eg-head{padding:20px 22px;border-bottom:2px solid var(--rule);display:flex;gap:14px;align-items:baseline;flex-wrap:wrap}
+.eg-head h3{margin:0}
+.eg-tag{font-size:13px;font-weight:600;background:var(--note);padding:2px 9px;border-radius:3px}
+.eg-body{padding:6px 22px 20px}
+.eg-row{display:grid;grid-template-columns:190px 1fr;gap:14px;padding:13px 0;border-bottom:1px solid var(--rule-soft)}
+.eg-row:last-child{border-bottom:0}
+.eg-row dt{font-weight:600;font-size:15px}
+.eg-row dd{margin:0;font-size:15px;color:var(--ink-mute);line-height:1.7}
+
+/* ---------- กล่องเตือน ---------- */
+.warn{border:2px solid var(--rule);background:var(--note);padding:22px;margin-top:26px}
+.warn h3{margin-top:0}
+.warn p:last-child{margin-bottom:0}
+
+/* ---------- ท้ายหน้า ---------- */
+footer{padding:44px 0;font-size:14px;color:var(--ink-mute)}
+footer .wrap{display:flex;gap:18px;justify-content:space-between;flex-wrap:wrap}
+
+@media (max-width:860px){
+  .canvas{
+    grid-template-columns:repeat(2,1fr);
+    grid-template-areas:"kp ka" "kr vp" "cr ch" "cs cs" "co co" "rs rs";
+  }
+  .cell{min-height:120px}
+  .eg-row{grid-template-columns:1fr;gap:2px}
+  .hero{padding:44px 0 32px}
+  section{padding:40px 0}
+}
+@media (max-width:560px){
+  .canvas{grid-template-columns:1fr;grid-template-areas:"kp" "ka" "kr" "vp" "cr" "ch" "cs" "co" "rs"}
+  .top nav a{padding:7px 11px;font-size:14px}
+  body{font-size:16px}
+}

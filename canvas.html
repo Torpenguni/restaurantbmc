@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>กรอก Canvas ร้านของคุณ — ผังธุรกิจร้าน</title>
+<meta name="description" content="กรอก Business Model Canvas 9 ช่องของร้านคุณ เซฟอัตโนมัติในเบราว์เซอร์ ไม่ต้องสมัครสมาชิก สั่งพิมพ์เป็น PDF ได้">
+<link rel="stylesheet" href="/fonts/anuphan.css">
+<link rel="stylesheet" href="/styles.css">
+<meta name="robots" content="index, follow">
+<style>
+/* ---------- เฉพาะหน้ากรอก ---------- */
+.tool-head{padding:32px 0 22px;border-bottom:2px solid var(--rule)}
+.tool-head h1{font-size:clamp(26px,3.6vw,38px);max-width:none;margin-bottom:10px}
+.shopname{
+  font:inherit;font-size:19px;font-weight:600;
+  border:none;border-bottom:2px solid var(--rule);background:transparent;
+  padding:5px 2px;width:min(420px,100%);color:var(--ink);
+}
+.shopname::placeholder{color:#b3b1a6;font-weight:400}
+.shopname:focus{outline:none;background:var(--note)}
+
+.bar{
+  display:flex;gap:10px;flex-wrap:wrap;align-items:center;
+  padding:16px 0;border-bottom:2px solid var(--rule);
+  position:sticky;top:62px;background:var(--paper);z-index:40;
+}
+.bar .btn{padding:10px 17px;font-size:15px}
+.status{font-size:14px;color:var(--ink-mute);margin-left:auto}
+
+.fill{
+  display:grid;gap:2px;background:var(--rule);
+  border:2px solid var(--rule);margin:26px 0 10px;
+  grid-template-columns:repeat(10,1fr);
+  grid-template-areas:
+    "kp kp ka ka vp vp cr cr cs cs"
+    "kp kp kr kr vp vp ch ch cs cs"
+    "co co co co co rs rs rs rs rs";
+}
+.f{background:var(--paper-2);padding:13px 13px 11px;display:flex;flex-direction:column;min-height:210px}
+.f .n{font-size:11px;font-weight:700;color:var(--ink-mute);letter-spacing:0.1em}
+.f label{font-size:15px;font-weight:700;margin:2px 0 3px;display:block;line-height:1.35}
+.f .hint{font-size:12.5px;color:var(--ink-mute);line-height:1.5;margin:0 0 8px}
+.f textarea{
+  flex:1;width:100%;resize:vertical;min-height:96px;
+  font:inherit;font-size:14.5px;line-height:1.65;color:var(--ink);
+  border:1px dashed var(--rule-soft);border-radius:4px;
+  background:transparent;padding:9px 10px;
+}
+.f textarea:focus{outline:none;border-color:var(--rule);border-style:solid;background:#fffdf2}
+.f.key{background:var(--note)}
+.f.key .n,.f.key .hint{color:#5a4a00}
+.f.key textarea{border-color:#d7b400;background:rgba(255,255,255,.55)}
+.f.key textarea:focus{background:#fff}
+
+.tip{font-size:14px;color:var(--ink-mute);margin:0 0 34px}
+
+/* ---------- ตอนสั่งพิมพ์ ---------- */
+@media print{
+  @page{size:A4 landscape;margin:9mm}
+  .top,.bar,.tip,footer,.noprint{display:none !important}
+  body{background:#fff;font-size:10pt}
+  .tool-head{padding:0 0 8px;border-bottom:1.5pt solid #000}
+  .tool-head h1{font-size:15pt;margin:0 0 4px}
+  .shopname{border-bottom:1pt solid #000;font-size:13pt}
+  .wrap{padding:0;max-width:none}
+  .fill{margin:8px 0 0;border-width:1.5pt;gap:1.5pt;background:#000}
+  .f{min-height:0;padding:6px 7px}
+  .f label{font-size:9.5pt;margin:0}
+  .f .hint{display:none}
+  .f textarea{
+    border:0;padding:2px 0;min-height:0;height:auto;font-size:9pt;line-height:1.45;
+    background:transparent;overflow:visible;
+  }
+  .f.key{background:#f4f4f0 !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+
+<header class="top noprint">
+  <div class="wrap">
+    <a href="/" class="brand">ผัง<span>ธุรกิจร้าน</span></a>
+    <nav>
+      <a href="/#blocks">ความหมาย 9 ช่อง</a>
+      <a href="/#examples">ตัวอย่าง</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+
+<section class="tool-head">
+  <h1>Canvas ร้านของคุณ</h1>
+  <label for="shop" style="display:none">ชื่อร้าน</label>
+  <input id="shop" class="shopname" type="text" placeholder="พิมพ์ชื่อร้านตรงนี้" autocomplete="off">
+</section>
+
+<div class="bar noprint">
+  <button class="btn btn-note" id="print" type="button">พิมพ์ / บันทึกเป็น PDF</button>
+  <button class="btn btn-plain" id="clear" type="button">ล้างทั้งหมด</button>
+  <span class="status" id="status">ยังไม่ได้กรอก</span>
+</div>
+
+<div class="fill">
+  <div class="f c-kp"><div class="n">01</div><label for="kp">พันธมิตรหลัก</label>
+    <p class="hint">ใครที่ถ้าหายไปแล้วร้านสะดุด</p>
+    <textarea id="kp" data-k="kp" placeholder="ซัพพลายเออร์ · เจ้าของที่ · แพลตฟอร์มเดลิเวอรี · คนที่ให้เครดิตเทอม"></textarea></div>
+
+  <div class="f c-ka"><div class="n">02</div><label for="ka">กิจกรรมหลัก</label>
+    <p class="hint">ทุกวันต้องทำอะไรและห้ามพลาด</p>
+    <textarea id="ka" data-k="ka" placeholder="เตรียมวัตถุดิบ · คุมคุณภาพ · สั่งของ · ทำคอนเทนต์"></textarea></div>
+
+  <div class="f c-kr"><div class="n">03</div><label for="kr">ทรัพยากรหลัก</label>
+    <p class="hint">มีอะไรอยู่ในมือที่ใช้แข่งได้</p>
+    <textarea id="kr" data-k="kr" placeholder="ทำเล · สูตร · ทีมกี่คน · ครัวรองรับกี่จานต่อชั่วโมง"></textarea></div>
+
+  <div class="f c-vp key"><div class="n">04</div><label for="vp">คุณค่าที่ส่งมอบ</label>
+    <p class="hint">ลูกค้าเลือกเราแทนร้านข้าง ๆ เพราะอะไร — ห้ามใช้คำว่าอร่อย สะอาด บริการดี</p>
+    <textarea id="vp" data-k="vp" placeholder="เขียนเป็นประโยคที่ลูกค้าจะพูดเอง เช่น อิ่มจริงในราคา 60 และได้ที่นั่งใน 5 นาที"></textarea></div>
+
+  <div class="f c-cr"><div class="n">05</div><label for="cr">ความสัมพันธ์</label>
+    <p class="hint">ทำยังไงให้เขากลับมาครั้งที่สอง</p>
+    <textarea id="cr" data-k="cr" placeholder="บัตรสะสม · LINE OA · จำหน้าจำชื่อ · ตอบรีวิวภายในกี่ชั่วโมง"></textarea></div>
+
+  <div class="f c-ch"><div class="n">06</div><label for="ch">ช่องทาง</label>
+    <p class="hint">ลูกค้าเจอเราและซื้อได้ทางไหน ใส่สัดส่วนจริง</p>
+    <textarea id="ch" data-k="ch" placeholder="หน้าร้าน 70% · เดลิเวอรี 25% · จัดเลี้ยง 5%"></textarea></div>
+
+  <div class="f c-cs key"><div class="n">07</div><label for="cs">กลุ่มลูกค้า</label>
+    <p class="hint">ใครคือคนจ่ายเงินจริง — คำว่าคนทั่วไปใช้ไม่ได้</p>
+    <textarea id="cs" data-k="cs" placeholder="มาช่วงไหน มาคนเดียวหรือมากลุ่ม จ่ายต่อหัวเท่าไหร่ ถ้ามีหลายกลุ่มให้แยกเขียน"></textarea></div>
+
+  <div class="f c-co"><div class="n">08</div><label for="co">โครงสร้างต้นทุน</label>
+    <p class="hint">เงินออกทางไหน แยกคงที่กับผันแปร</p>
+    <textarea id="co" data-k="co" placeholder="คงที่: ค่าเช่า เงินเดือน · ผันแปร: วัตถุดิบกี่% ค่าแรงกี่% GP · เท่าทุนที่กี่บิลต่อวัน"></textarea></div>
+
+  <div class="f c-rs"><div class="n">09</div><label for="rs">รายได้</label>
+    <p class="hint">เงินเข้าทางไหน ยอดต่อบิลเท่าไหร่</p>
+    <textarea id="rs" data-k="rs" placeholder="ขายหน้าร้าน · เดลิเวอรี · จัดเลี้ยง · ยอดต่อบิลเฉลี่ย กี่บิลต่อวัน"></textarea></div>
+</div>
+
+<p class="tip noprint">
+  เซฟอัตโนมัติในเบราว์เซอร์ของคุณเอง ข้อมูลไม่ถูกส่งไปไหนและเราไม่เห็น
+  ถ้าเปลี่ยนเครื่องหรือล้างข้อมูลเบราว์เซอร์ ข้อมูลจะหาย — กด "พิมพ์ / บันทึกเป็น PDF" เก็บไว้ด้วย
+</p>
+
+</div>
+
+<footer class="noprint">
+  <div class="wrap">
+    <span>ผังธุรกิจร้าน</span>
+    <span><a href="/">กลับหน้าแรก</a></span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var KEY = 'bmc-restaurant-v1';
+  var fields = [].slice.call(document.querySelectorAll('[data-k]'));
+  var shop = document.getElementById('shop');
+  var status = document.getElementById('status');
+
+  function load(){
+    var raw;
+    try { raw = localStorage.getItem(KEY); } catch(e){ return false; }   // โหมดส่วนตัวบางเบราว์เซอร์โยน error
+    if(!raw) return false;
+    var d;
+    try { d = JSON.parse(raw); } catch(e){ return false; }
+    if(d.shop) shop.value = d.shop;
+    fields.forEach(function(f){ if(d[f.dataset.k]) f.value = d[f.dataset.k]; });
+    return true;
+  }
+
+  function save(){
+    var d = { shop: shop.value };
+    fields.forEach(function(f){ d[f.dataset.k] = f.value; });
+    try { localStorage.setItem(KEY, JSON.stringify(d)); }
+    catch(e){ status.textContent = 'เบราว์เซอร์นี้เซฟไม่ได้ กรุณาพิมพ์เก็บไว้'; return; }
+    var n = fields.filter(function(f){ return f.value.trim(); }).length;
+    status.textContent = n === 0 ? 'ยังไม่ได้กรอก'
+                       : n === 9 ? 'กรอกครบ 9 ช่องแล้ว · เซฟอัตโนมัติ'
+                       : 'กรอกแล้ว ' + n + ' จาก 9 ช่อง · เซฟอัตโนมัติ';
+  }
+
+  // textarea มีความสูงคงที่ ตอนพิมพ์ข้อความที่เกินขอบจะถูกตัดหาย
+  // ก่อนพิมพ์จึงยืดความสูงให้พอดีเนื้อหาทุกช่อง แล้วคืนค่าเดิมหลังพิมพ์
+  function grow(f){ f.style.height='auto'; f.style.height = f.scrollHeight + 'px'; }
+  function expandAll(){ fields.forEach(grow); }
+  function resetAll(){ fields.forEach(function(f){ f.style.height=''; }); }
+
+  fields.concat([shop]).forEach(function(f){
+    f.addEventListener('input', save);
+  });
+
+  document.getElementById('print').addEventListener('click', function(){
+    expandAll();
+    window.print();
+  });
+  window.addEventListener('beforeprint', expandAll);
+  window.addEventListener('afterprint', resetAll);
+
+  document.getElementById('clear').addEventListener('click', function(){
+    if(!confirm('ล้างข้อมูลทั้งหมดในหน้านี้ ทำแล้วย้อนกลับไม่ได้')) return;
+    shop.value = '';
+    fields.forEach(function(f){ f.value = ''; });
+    try { localStorage.removeItem(KEY); } catch(e){}
+    save();
+  });
+
+  load();
+  save();
+})();
+</script>
+
+</body>
+</html>
