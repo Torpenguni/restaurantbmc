@@ -564,7 +564,13 @@
     pool.forEach(function(it){
       // ให้คะแนนจากคำที่ตรงกันระหว่างชื่อบทความกับสิ่งที่ผู้ใช้พิมพ์
       // ภาษาไทยตัดคำไม่ได้ จึงเทียบกับรายการคำที่คัดไว้แทน
-      it._r = it.k.reduce(function(a, k){ return a + (t.indexOf(k.toLowerCase()) >= 0 ? 2 : 0); }, 0);
+      // k เก็บเป็น "คำ|ช่องที่คำนั้นใช้ได้" — คำเดียวกันหมายคนละเรื่องต่างช่อง
+      // เช่น "พนักงาน" ในช่องกลุ่มลูกค้าคือคนออฟฟิศที่มากิน ไม่ใช่ลูกจ้างร้าน
+      it._r = it.k.reduce(function(a, kk){
+        var parts = kk.split('|'), word = parts[0], scope = parts[1] || '';
+        if (scope !== '*' && scope.indexOf(block) < 0) return a;
+        return a + (t.indexOf(word.toLowerCase()) >= 0 ? 2 : 0);
+      }, 0);
       if (it.c === 'feasibility') it._r += 0.6;    // หมวดนี้ตรงกับการวางโมเดลที่สุด
       if (it.c === 'case-studies') it._r += 0.3;
     });
