@@ -1,0 +1,9 @@
+{
+  "name": "restaurantbmc",
+  "private": true,
+  "type": "commonjs",
+  "description": "Business Model Canvas สำหรับร้านอาหาร — หน้าเว็บเป็น static ส่วน api/ เป็น serverless function",
+  "dependencies": {
+    "pg": "^8.13.1"
+  }
+}

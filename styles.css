@@ -689,3 +689,31 @@ dialog.ask .btn{padding:10px 17px;font-size:14.5px}
 .picker .opt{font-size:12.5px;padding:5px 11px}
 .picker .cur{font-size:12px;color:var(--ink-faint);margin-left:6px;font-weight:400}
 @media print{ .picker,#step-profile .opts{display:none} }
+
+
+/* ---------- ห้องเรียน ----------
+   งานเก็บบนระบบเมื่อเข้าห้องแล้ว ไม่เข้าก็ยังใช้ได้ทุกอย่างเหมือนเดิม
+   แถบนี้จึงบอกสถานะ ไม่ได้บังคับให้ล็อกอินก่อนใช้ */
+.roombar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  max-width:1180px;margin:0 auto 10px;padding:9px 14px;
+  background:#fff;border:1px solid #e5e7eb;border-radius:10px;font-size:14px}
+.roombar #roomwho{color:#4b5563}
+.roombar #roomwho b{color:#111827}
+.roombar .btn{margin-left:auto;padding:6px 13px;font-size:13.5px}
+.roombar .btn + .btn{margin-left:0}
+.roomdlg{position:fixed;inset:0;z-index:80;background:rgba(17,24,39,.55);
+  display:flex;align-items:center;justify-content:center;padding:20px}
+.roombox{background:#fff;border-radius:14px;padding:24px;max-width:440px;width:100%;
+  box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.roombox h3{margin:0 0 8px;font-size:20px}
+.roombox p{margin:0 0 14px;font-size:14px;color:#4b5563;line-height:1.65}
+.rf{display:block;margin-bottom:12px}
+.rf span{display:block;font-size:13px;color:#4b5563;margin-bottom:4px}
+.rf input{width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:9px;
+  font:inherit;font-size:15px}
+.rf input:focus{outline:2px solid #0f766e;outline-offset:-1px}
+#rcode{letter-spacing:.14em;text-transform:uppercase;font-weight:600}
+.rmsg{min-height:20px;margin:0 0 8px;font-size:13.5px;color:#b42318}
+.rbtns{display:flex;gap:8px}
+.rnote{margin:12px 0 0;font-size:12.5px;color:#6b7280;line-height:1.6}
+@media print{.roombar,.roomdlg{display:none!important}}

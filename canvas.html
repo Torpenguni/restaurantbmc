@@ -16,7 +16,25 @@
 <body class="tool">
 
 <header class="top noprint">
-  <div class="wrap">
+  <div class="roomdlg noprint" id="roomdlg" hidden>
+  <div class="roombox" role="dialog" aria-label="เข้าห้องเรียน">
+    <h3>เข้าห้องเรียน</h3>
+    <p>กรอกรหัสห้องที่ครูให้ไว้ กับชื่อของตัวเอง แล้วงานจะถูกเก็บไว้บนระบบ
+      เปิดเครื่องไหนก็ทำต่อได้ ไม่ต้องมีอีเมล ไม่ต้องตั้งรหัสผ่าน</p>
+    <label class="rf"><span>รหัสห้อง</span>
+      <input id="rcode" autocomplete="off" autocapitalize="characters" placeholder="เช่น K7M2QP"></label>
+    <label class="rf"><span>ชื่อของคุณ</span>
+      <input id="rname" autocomplete="name" placeholder="ชื่อ-นามสกุล หรือชื่อเล่นที่ครูรู้จัก"></label>
+    <p class="rmsg" id="rmsg"></p>
+    <div class="rbtns">
+      <button class="btn btn-note" id="rgo" type="button">เข้าห้อง</button>
+      <button class="btn btn-plain" id="rx" type="button">ยกเลิก</button>
+    </div>
+    <p class="rnote">ใช้ชื่อเดิมทุกครั้งที่กลับมา ระบบใช้ชื่อเป็นตัวหาว่างานของคุณคืออันไหน</p>
+  </div>
+</div>
+
+<div class="wrap">
     <a href="/" class="brand">Restaurant<span>BMC</span></a>
     <nav>
       <a href="/#blocks">ความหมาย 9 ช่อง</a>
@@ -40,6 +58,14 @@
 </dialog>
 
 <div class="wrap">
+
+<!-- แถบบัญชี ซ่อนไว้จนกว่าจะรู้ว่าเปิดใช้ห้องเรียนอยู่หรือไม่
+     เว็บนี้ใช้ได้โดยไม่ต้องเข้าห้องเลย การเข้าห้องเป็นของเพิ่ม ไม่ใช่ด่าน -->
+<div class="roombar noprint" id="roombar" hidden>
+  <span id="roomwho"></span>
+  <button class="btn btn-plain" id="roomjoin" type="button">เข้าห้องเรียน</button>
+  <button class="btn btn-plain" id="roomout" type="button" hidden>ออกจากห้อง</button>
+</div>
 
 <section class="tool-head">
   <h1>Canvas ร้านของคุณ</h1>
@@ -1154,7 +1180,154 @@
 
   window.addEventListener('load', function(){ drawCoach(); });
 
+  /* ---------- ห้องเรียน ----------
+     เข้าห้องแล้วงานถูกเก็บบนระบบ เปิดเครื่องไหนก็ทำต่อได้
+     ไม่เข้าห้องก็ใช้ได้ทุกอย่างเหมือนเดิม เก็บในเครื่องอย่างเดียว
+     localStorage ยังเซฟต่อไปเสมอ เป็นตัวสำรองตอนเน็ตหลุด ไม่ใช่ทางเดียวที่งานจะรอด */
+  var TKEY = 'bmc-room-token';
+  var tok = null, me = null, cloudTimer = null, lastSent = '';
+  /* ห้ามส่งขึ้นระบบจนกว่าจะดึงของบนระบบมาดูก่อน
+     ไม่งั้นเครื่องที่เพิ่งเปิดมาแบบยังว่าง จะอัปโหลดความว่างไปทับงานบนระบบ
+     ถ้าเน็ตช้าแล้วจังหวะสลับกัน งานหายทั้งก้อนโดยไม่มีใครรู้ตัว */
+  var syncReady = false;
+  try { tok = localStorage.getItem(TKEY); } catch(e){}
+  try { me = JSON.parse(localStorage.getItem('bmc-room-me') || 'null'); } catch(e){}
+
+  var bar = document.getElementById('roombar');
+  var dlg = document.getElementById('roomdlg');
+
+  function paintBar(){
+    bar.hidden = false;
+    var who = document.getElementById('roomwho');
+    if (tok && me) {
+      who.innerHTML = 'เก็บงานไว้บนระบบในชื่อ <b>' + esc(me.name) + '</b>' +
+        (me.room ? ' · ห้อง ' + esc(me.room) : '');
+      document.getElementById('roomjoin').hidden = true;
+      document.getElementById('roomout').hidden = false;
+    } else {
+      who.textContent = 'งานนี้เก็บอยู่ในเครื่องนี้เท่านั้น ถ้าเปลี่ยนเครื่องจะไม่มีงานตามไป';
+      document.getElementById('roomjoin').hidden = false;
+      document.getElementById('roomout').hidden = true;
+    }
+  }
+  function openDlg(){ dlg.hidden = false; document.getElementById('rcode').focus(); }
+  function closeDlg(){ dlg.hidden = true; document.getElementById('rmsg').textContent = ''; }
+  document.getElementById('roomjoin').addEventListener('click', openDlg);
+  document.getElementById('rx').addEventListener('click', closeDlg);
+  dlg.addEventListener('click', function(e){ if (e.target === dlg) closeDlg(); });
+  document.getElementById('roomout').addEventListener('click', async function(){
+    if (!await ask('ออกจากห้อง',
+      'งานที่เก็บบนระบบยังอยู่ กลับเข้ามาด้วยรหัสและชื่อเดิมก็เจอของเดิม ' +
+      'ส่วนงานในเครื่องนี้ยังอยู่ตามปกติ', 'ออกจากห้อง')) return;
+    tok = null; me = null;
+    try { localStorage.removeItem(TKEY); localStorage.removeItem('bmc-room-me'); } catch(e){}
+    paintBar(); status.textContent = 'ออกจากห้องแล้ว · งานยังเก็บในเครื่องนี้';
+  });
+
+  document.getElementById('rgo').addEventListener('click', async function(){
+    var msg = document.getElementById('rmsg');
+    var code = document.getElementById('rcode').value.trim().toUpperCase();
+    var name = document.getElementById('rname').value.trim();
+    if (!code || !name) { msg.textContent = 'กรอกรหัสห้องและชื่อให้ครบ'; return; }
+    var btn = document.getElementById('rgo');
+    btn.disabled = true; msg.style.color = '#4b5563'; msg.textContent = 'กำลังเข้าห้อง…';
+    try {
+      var send = async function(confirmExisting){
+        var rr = await fetch('/api/join', { method:'POST',
+          headers:{'content-type':'application/json'},
+          body: JSON.stringify({ code:code, name:name, confirmExisting:confirmExisting }) });
+        return { r:rr, d: await rr.json().catch(function(){ return {}; }) };
+      };
+      var out = await send(false);
+      var r = out.r, d = out.d;
+      /* ชื่อซ้ำในห้อง ถามก่อนว่าเป็นคนเดิมกลับมาหรือคนละคน
+         ถ้าเผลอยืนยันทั้งที่เป็นคนละคน งานของคนแรกจะถูกเขียนทับ จึงต้องเขียนให้ชัด */
+      if (r.status === 409 && d.needConfirm) {
+        btn.disabled = false;
+        var same = await ask('มีชื่อนี้ในห้องแล้ว', d.hint || '', 'ใช่ นี่คือฉันเอง');
+        if (!same) { msg.style.color = '#4b5563';
+          msg.textContent = 'เติมนามสกุลหรือเลขที่ต่อท้ายชื่อ แล้วกดเข้าห้องอีกครั้ง'; return; }
+        btn.disabled = true; msg.textContent = 'กำลังเข้าห้อง…';
+        out = await send(true); r = out.r; d = out.d;
+      }
+      if (!r.ok) { msg.style.color = '#b42318';
+        msg.textContent = d.error || 'เข้าห้องไม่สำเร็จ'; btn.disabled = false; return; }
+      tok = d.token; me = { name:d.name, room:d.room };
+      try { localStorage.setItem(TKEY, tok);
+            localStorage.setItem('bmc-room-me', JSON.stringify(me)); } catch(e){}
+      closeDlg(); paintBar(); btn.disabled = false;
+      syncReady = false; lastSent = '';
+      await pullCloud(true);
+    } catch (err) {
+      msg.style.color = '#b42318'; msg.textContent = 'ต่อระบบไม่ได้ ลองอีกครั้ง';
+      btn.disabled = false;
+    }
+  });
+
+  /* ดึงงานจากระบบ ถ้ามีของทั้งสองฝั่งต้องถามก่อน ไม่ทับเงียบ ๆ
+     ตอนเพิ่งเข้าห้องครั้งแรกจากเครื่องที่กรอกไว้แล้ว เจอกรณีนี้บ่อยที่สุด */
+  async function pullCloud(justJoined){
+    if (!tok) return;
+    try {
+      var r = await fetch('/api/canvas', { headers:{ authorization:'Bearer ' + tok } });
+      if (r.status === 401) { tok = null; me = null;
+        try { localStorage.removeItem(TKEY); } catch(e){}
+        paintBar(); status.textContent = 'บัตรผ่านหมดอายุ เข้าห้องอีกครั้ง'; return; }
+      var d = await r.json().catch(function(){ return {}; });
+      var cloud = d && d.data && d.data.blocks ? d.data : null;
+      var hasLocal = fields.some(function(f){ return f.value.trim(); });
+      if (!cloud) { syncReady = true; if (hasLocal) pushCloud(true); return; }
+      if (hasLocal && justJoined) {
+        var keep = await ask('พบงานที่เก็บไว้บนระบบ',
+          'ในระบบมีงานของคุณอยู่แล้ว ส่วนในเครื่องนี้ก็มีที่กรอกไว้ จะใช้อันไหนต่อ',
+          'ใช้ของบนระบบ');
+        if (!keep) { syncReady = true; pushCloud(true);
+          status.textContent = 'ใช้งานในเครื่องนี้ต่อ และอัปโหลดขึ้นระบบแล้ว'; return; }
+      }
+      state = cloud;
+      try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e){}
+      load(); drawProfile(); drawSTP(); drawTGT(); drawVP();
+      drawChips(); drawPicker(); drawStrength(); scoreStrength(); review();
+      lastSent = JSON.stringify(state);
+      syncReady = true;
+      status.textContent = 'ดึงงานจากระบบแล้ว';
+    } catch (e) {
+      /* เน็ตไม่ดีก็ใช้ของในเครื่องต่อไป ไม่ต้องขึ้น error ให้ตกใจ
+         แต่ต้องไม่เปิดให้ส่งขึ้นระบบ เพราะยังไม่รู้ว่าบนระบบมีอะไรอยู่ */
+    }
+  }
+
+  function pushCloud(now){
+    if (!tok || !syncReady) return;
+    clearTimeout(cloudTimer);
+    var go = async function(){
+      var text = JSON.stringify(state);
+      if (text === lastSent) return;            // ไม่มีอะไรเปลี่ยน ไม่ต้องยิง
+      try {
+        var r = await fetch('/api/canvas', { method:'PUT',
+          headers:{ 'content-type':'application/json', authorization:'Bearer ' + tok },
+          body: JSON.stringify({ data: state }) });
+        if (r.ok) { lastSent = text;
+          status.textContent = 'เซฟขึ้นระบบแล้ว · เปิดเครื่องไหนก็ทำต่อได้'; }
+        else if (r.status === 401) { tok = null; paintBar();
+          status.textContent = 'บัตรผ่านหมดอายุ เข้าห้องอีกครั้ง งานในเครื่องยังอยู่'; }
+        else status.textContent = 'เซฟขึ้นระบบไม่สำเร็จ · งานยังอยู่ในเครื่องนี้';
+      } catch (e) {
+        status.textContent = 'ออฟไลน์ · งานเก็บในเครื่องนี้ไว้แล้ว';
+      }
+    };
+    // หน่วงไว้ให้คนพิมพ์จบก่อน ไม่ยิงทุกตัวอักษร
+    if (now) go(); else cloudTimer = setTimeout(go, 2500);
+  }
+
+  /* ผูกเข้ากับ save() เดิมโดยไม่ไปแก้ตัวมัน ของเดิมถูกเรียกจากหลายที่มาก
+     ห่อทับแล้วต่อท้ายด้วยการส่งขึ้นระบบ ปลอดภัยกว่าไปแก้ข้างใน */
+  var saveLocal = save;
+  save = function(){ saveLocal(); pushCloud(false); };
+
   load(); drawStepper(); drawProfile(); drawSTP(); drawTGT(); drawVP(); drawChips(); drawPicker(); drawStrength(); scoreStrength(); save(); review();
+  paintBar();
+  if (tok) pullCloud(false); else syncReady = true;
 })();
 </script>
 

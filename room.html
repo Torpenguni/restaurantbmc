@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>ห้องเรียน — RestaurantBMC</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+/* หน้าของครูอย่างเดียว ไม่ต้องสวยเท่าหน้าหลัก ต้องอ่านออกและใช้ได้เร็ว */
+body{background:#f6f7f5}
+.wrap{max-width:1000px;margin:0 auto;padding:26px 18px 60px}
+h1{font-size:24px;margin:0 0 6px}
+.sub{color:#4b5563;font-size:14.5px;margin:0 0 22px;line-height:1.6}
+.card{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:18px;margin-bottom:18px}
+.card h2{font-size:16px;margin:0 0 12px}
+.row{display:flex;gap:9px;flex-wrap:wrap;align-items:flex-end}
+label{display:block;font-size:13px;color:#4b5563;margin-bottom:4px}
+input{padding:9px 11px;border:1px solid #d1d5db;border-radius:8px;font:inherit;font-size:14.5px}
+button{padding:9px 16px;border:0;border-radius:8px;background:#0f766e;color:#fff;font:inherit;
+  font-size:14.5px;cursor:pointer}
+button.plain{background:#fff;color:#111827;border:1px solid #d1d5db}
+button:disabled{opacity:.5;cursor:not-allowed}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;padding:8px 10px;border-bottom:2px solid #e5e7eb;font-size:12px;
+  text-transform:uppercase;letter-spacing:.05em;color:#6b7280}
+td{padding:9px 10px;border-bottom:1px solid #f3f4f6;vertical-align:middle}
+.code{font-family:ui-monospace,Menlo,monospace;font-weight:700;letter-spacing:.1em;font-size:16px}
+.bar{display:inline-block;width:92px;height:8px;border-radius:99px;background:#e5e7eb;overflow:hidden;
+  vertical-align:middle;margin-right:7px}
+.bar i{display:block;height:100%;background:#0f766e}
+.msg{font-size:13.5px;color:#b42318;min-height:20px}
+.mut{color:#6b7280}
+.tiny{font-size:12.5px;color:#6b7280}
+pre{background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:12px;font-size:12.5px;
+  white-space:pre-wrap;word-break:break-word;max-height:420px;overflow:auto}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>ห้องเรียน</h1>
+  <p class="sub">สร้างรหัสห้องให้นักเรียนใช้เข้าระบบ แล้วดูว่าใครกรอกไปถึงไหน
+    งานของนักเรียนเก็บบนระบบ เปิดเครื่องไหนก็ทำต่อได้</p>
+
+  <div class="card" id="gate">
+    <h2>ใส่กุญแจของครู</h2>
+    <div class="row">
+      <div><label for="key">กุญแจ</label><input id="key" type="password" style="min-width:260px"></div>
+      <button id="go">เข้า</button>
+    </div>
+    <p class="msg" id="gmsg"></p>
+  </div>
+
+  <div id="main" hidden>
+    <div class="card">
+      <h2>สร้างห้องใหม่</h2>
+      <div class="row">
+        <div><label for="label">ชื่อห้อง</label>
+          <input id="label" placeholder="เช่น ม.5/2 ภาคเรียน 1" style="min-width:240px"></div>
+        <div><label for="max">รับได้กี่คน</label>
+          <input id="max" type="number" min="1" placeholder="เว้นว่าง = ไม่จำกัด" style="width:170px"></div>
+        <div><label for="days">หมดอายุในกี่วัน</label>
+          <input id="days" type="number" min="1" placeholder="เว้นว่าง = ไม่หมด" style="width:150px"></div>
+        <button id="mk">สร้างรหัส</button>
+      </div>
+      <p class="msg" id="cmsg"></p>
+    </div>
+
+    <div class="card">
+      <h2>ห้องทั้งหมด</h2>
+      <div id="rooms"></div>
+    </div>
+
+    <div class="card" id="rosterCard" hidden>
+      <h2 id="rosterTitle">นักเรียนในห้อง</h2>
+      <div id="roster"></div>
+    </div>
+
+    <div class="card" id="oneCard" hidden>
+      <h2 id="oneTitle">งานของนักเรียน</h2>
+      <pre id="one"></pre>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var KEY = 'bmc-teacher-key';
+  var key = null;
+  try { key = sessionStorage.getItem(KEY); } catch(e){}
+  var esc = function(x){ return String(x==null?'':x).replace(/[&<>"]/g,function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
+  var $ = function(id){ return document.getElementById(id); };
+
+  async function api(method, path, body){
+    var r = await fetch('/api/room' + (path||''), { method:method,
+      headers:{ 'content-type':'application/json', 'x-admin-key': key },
+      body: body ? JSON.stringify(body) : undefined });
+    var d = await r.json().catch(function(){ return {}; });
+    if (!r.ok) throw new Error(d.error || ('ผิดพลาด ' + r.status));
+    return d;
+  }
+  function enter(){
+    $('gate').hidden = true; $('main').hidden = false;
+    try { sessionStorage.setItem(KEY, key); } catch(e){}
+    loadRooms();
+  }
+  $('go').addEventListener('click', async function(){
+    key = $('key').value.trim();
+    if (!key) { $('gmsg').textContent = 'ใส่กุญแจก่อน'; return; }
+    try { await api('GET'); enter(); }
+    catch(e){ $('gmsg').textContent = 'กุญแจไม่ถูกต้อง'; }
+  });
+  $('key').addEventListener('keydown', function(e){ if (e.key==='Enter') $('go').click(); });
+
+  $('mk').addEventListener('click', async function(){
+    $('cmsg').textContent = '';
+    var label = $('label').value.trim();
+    if (!label) { $('cmsg').textContent = 'ตั้งชื่อห้องก่อน'; return; }
+    try {
+      var d = await api('POST', '', { label:label, maxUses:$('max').value, days:$('days').value });
+      $('label').value = ''; $('max').value = ''; $('days').value = '';
+      $('cmsg').style.color = '#0f766e';
+      $('cmsg').textContent = 'สร้างแล้ว รหัสคือ ' + d.code + ' — เขียนบนกระดานให้นักเรียนพิมพ์ตาม';
+      loadRooms();
+    } catch(e){ $('cmsg').style.color = '#b42318'; $('cmsg').textContent = e.message; }
+  });
+
+  async function loadRooms(){
+    var d = await api('GET');
+    if (!d.rooms.length) { $('rooms').innerHTML = '<p class="mut">ยังไม่มีห้อง สร้างห้องแรกด้านบน</p>'; return; }
+    $('rooms').innerHTML = '<table><thead><tr><th>รหัส</th><th>ชื่อห้อง</th>' +
+      '<th>นักเรียน</th><th>หมดอายุ</th><th></th></tr></thead><tbody>' +
+      d.rooms.map(function(r){
+        return '<tr><td class="code">' + esc(r.code) + '</td>' +
+          '<td>' + esc(r.label) + '</td>' +
+          '<td>' + r.students + (r.max_uses ? ' / ' + r.max_uses : '') + '</td>' +
+          '<td class="tiny">' + (r.expires_at ? new Date(r.expires_at).toLocaleDateString('th-TH') : 'ไม่หมดอายุ') + '</td>' +
+          '<td><button class="plain" data-r="' + esc(r.code) + '">ดูนักเรียน</button></td></tr>';
+      }).join('') + '</tbody></table>';
+    Array.prototype.forEach.call($('rooms').querySelectorAll('[data-r]'), function(b){
+      b.addEventListener('click', function(){ loadRoster(b.dataset.r); });
+    });
+  }
+
+  async function loadRoster(code){
+    var d = await api('GET', '?code=' + encodeURIComponent(code));
+    $('rosterCard').hidden = false;
+    $('rosterTitle').textContent = 'นักเรียนในห้อง ' + code + ' (' + d.students.length + ' คน)';
+    if (!d.students.length) { $('roster').innerHTML = '<p class="mut">ยังไม่มีใครเข้าห้องนี้</p>'; return; }
+    $('roster').innerHTML = '<table><thead><tr><th>ชื่อ</th><th>ชื่อร้าน</th>' +
+      '<th>กรอกแล้ว</th><th>แก้ล่าสุด</th><th></th></tr></thead><tbody>' +
+      d.students.map(function(s){
+        return '<tr><td><b>' + esc(s.name) + '</b></td>' +
+          '<td>' + (s.title ? esc(s.title) : '<span class="mut">—</span>') + '</td>' +
+          '<td><span class="bar"><i style="width:' + Math.round(s.filled/9*100) + '%"></i></span>' +
+            s.filled + '/9</td>' +
+          '<td class="tiny">' + (s.updated_at ? new Date(s.updated_at).toLocaleString('th-TH') : '—') + '</td>' +
+          '<td><button class="plain" data-s="' + s.id + '">ดูงาน</button></td></tr>';
+      }).join('') + '</tbody></table>';
+    Array.prototype.forEach.call($('roster').querySelectorAll('[data-s]'), function(b){
+      b.addEventListener('click', function(){ loadOne(b.dataset.s); });
+    });
+  }
+
+  /* โชว์เป็นข้อความดิบไปก่อน ครูอ่านได้ว่าเด็กตอบอะไร
+     ถ้าจะทำให้สวยเท่าหน้าของนักเรียนต้องยกทั้งหน้ามา ซึ่งเกินความจำเป็นตอนนี้ */
+  async function loadOne(id){
+    var d = await api('PATCH', '', { userId:Number(id) });
+    $('oneCard').hidden = false;
+    $('oneTitle').textContent = 'งานของ ' + d.name;
+    var b = (d.data && d.data.blocks) || {};
+    var lines = Object.keys(b).filter(function(k){ return String(b[k]||'').trim(); })
+      .map(function(k){ return k + '\n  ' + b[k]; });
+    $('one').textContent = (d.data && d.data.shop ? 'ร้าน: ' + d.data.shop + '\n\n' : '') +
+      (lines.length ? lines.join('\n\n') : 'ยังไม่ได้กรอกอะไร');
+    $('oneCard').scrollIntoView({ behavior:'smooth', block:'start' });
+  }
+
+  if (key) { api('GET').then(enter).catch(function(){ key = null; }); }
+})();
+</script>
+</body>
+</html>
