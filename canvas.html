@@ -49,6 +49,9 @@
 
 <div class="bar noprint">
   <button class="btn btn-note" id="print" type="button">พิมพ์ / บันทึกเป็น PDF</button>
+  <button class="btn btn-note" id="dlfile" type="button">บันทึกไฟล์เก็บไว้</button>
+  <label class="btn btn-note" for="upfile">เปิดไฟล์ที่เคยบันทึก
+    <input type="file" id="upfile" accept=".json,application/json" hidden></label>
   <button class="btn btn-plain" id="clear" type="button">ล้างทั้งหมด</button>
   <span class="status" id="status">ยังไม่ได้กรอก</span>
 </div>
@@ -1018,7 +1021,7 @@
   var aiConsent = false;
   var AI_ERR = {
     unconfigured:'ยังไม่ได้ตั้งค่า API key ที่ Vercel — ฟีเจอร์นี้จึงยังใช้ไม่ได้',
-    rate:'ขอบ่อยเกินไป รออีกสักครู่แล้วลองใหม่',
+    rate:'ตอนนี้มีคนใช้พร้อมกันหลายคน รอประมาณ 1 นาทีแล้วกดอีกครั้ง งานที่กรอกไว้ไม่หาย',
     'too-short':'ยังมีข้อมูลไม่พอให้อ่าน',
     origin:'เรียกจากที่อื่นไม่ได้',
     upstream:'ต้นทางตอบกลับผิดพลาด ลองใหม่อีกครั้ง',
@@ -1080,6 +1083,59 @@
     f.addEventListener('input', function(){ save(); review(); });
   });
   document.getElementById('print').addEventListener('click', function(){ expandAll(); window.print(); });
+
+  /* ---------- บันทึกเป็นไฟล์ และเปิดกลับมาแก้ต่อ ----------
+     งานเก็บอยู่ในเบราว์เซอร์ของเครื่องนั้นเครื่องเดียว
+     ล้างประวัติ เปลี่ยนเครื่อง หรือใช้โหมดไม่บันทึกประวัติ แล้วงานหายหมด
+     PDF เก็บไว้ดูได้แต่เอากลับมาแก้ไม่ได้ ต้องมีไฟล์ข้อมูลจริงให้ถือกลับบ้าน
+     ใช้กับห้องเรียนที่นักเรียนสลับเครื่องกันใช้เป็นหลัก */
+  function stamp(){
+    var d = new Date(), p = function(n){ return String(n).padStart(2,'0'); };
+    return d.getFullYear() + p(d.getMonth()+1) + p(d.getDate()) + '-' + p(d.getHours()) + p(d.getMinutes());
+  }
+  function safeName(x){
+    return String(x || '').trim().replace(/[\\/:*?"<>|]/g,'').slice(0,40) || 'bmc';
+  }
+  document.getElementById('dlfile').addEventListener('click', function(){
+    save();
+    var payload = { app:'restaurantbmc', v:3, savedAt:new Date().toISOString(), state:state };
+    var blob = new Blob([JSON.stringify(payload, null, 1)], { type:'application/json' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = safeName(shop.value) + '-' + stamp() + '.json';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); }, 4000);
+    status.textContent = 'บันทึกไฟล์แล้ว เก็บไฟล์นี้ไว้ เปิดกลับมาแก้ต่อได้';
+  });
+  document.getElementById('upfile').addEventListener('change', function(e){
+    var f = e.target.files && e.target.files[0];
+    if (!f) return;
+    var rd = new FileReader();
+    rd.onload = function(){
+      var d = null;
+      try { d = JSON.parse(rd.result); } catch(err){}
+      /* รับทั้งไฟล์ที่ห่อด้วย payload ของเรา และไฟล์ที่เป็น state เปล่า ๆ
+         คนอาจส่งไฟล์ต่อกันแล้วโดนแก้ระหว่างทาง เช็กว่ามี blocks ก่อนเชื่อ */
+      var st = d && d.state ? d.state : d;
+      if (!st || typeof st !== 'object' || !st.blocks) {
+        status.textContent = 'ไฟล์นี้ไม่ใช่ไฟล์ที่บันทึกจากหน้านี้';
+        e.target.value = ''; return;
+      }
+      /* มีของอยู่ในเครื่องแล้วต้องถามก่อน ไม่ใช่ทับเงียบ ๆ */
+      var has = fields.some(function(x){ return x.value.trim(); });
+      if (has && !confirm('เปิดไฟล์นี้จะแทนที่ที่กรอกไว้ในเครื่องนี้ทั้งหมด ทำต่อไหม')) {
+        e.target.value = ''; return;
+      }
+      state = st;
+      try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(err){}
+      /* วาดใหม่ด้วยลำดับเดียวกับตอนเปิดหน้า ไม่งั้นตารางบางส่วนจะค้างเป็นของเดิม */
+      load(); drawProfile(); drawSTP(); drawTGT(); drawVP();
+      drawChips(); drawPicker(); drawStrength(); scoreStrength(); save(); review();
+      status.textContent = 'เปิดไฟล์แล้ว กรอกต่อได้เลย';
+      e.target.value = '';
+    };
+    rd.readAsText(f);
+  });
   window.addEventListener('beforeprint', expandAll);
   window.addEventListener('afterprint', resetAll);
 
