@@ -1259,8 +1259,12 @@
       syncReady = false; lastSent = '';
       await pullCloud(true);
     } catch (err) {
-      msg.style.color = '#b42318'; msg.textContent = 'ต่อระบบไม่ได้ ลองอีกครั้ง';
+      /* บอกสาเหตุจริงไปด้วย "ต่อระบบไม่ได้" เฉย ๆ ทำให้ไล่ไม่ได้ว่าพังเพราะอะไร
+         ทั้งของคนใช้และของคนแก้ */
+      msg.style.color = '#b42318';
+      msg.textContent = 'ต่อระบบไม่ได้ · ' + (err && (err.name + ': ' + err.message) || 'ไม่ทราบสาเหตุ');
       btn.disabled = false;
+      if (window.console) console.error('join', err);
     }
   });
 
