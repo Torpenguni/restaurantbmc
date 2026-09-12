@@ -1194,7 +1194,10 @@
   try { me = JSON.parse(localStorage.getItem('bmc-room-me') || 'null'); } catch(e){}
 
   var bar = document.getElementById('roombar');
-  var dlg = document.getElementById('roomdlg');
+  /* ชื่อ roomDlg ถูกใช้อยู่แล้วโดยกล่องยืนยัน ask() ที่ประกาศไว้ก่อนหน้าในขอบเขตเดียวกัน
+     var ไม่สร้างขอบเขตใหม่ การตั้งชื่อซ้ำจึงไปทับของเดิม ทำให้ ask() พังทั้งหน้า
+     ไม่ใช่แค่เรื่องเข้าห้อง ปุ่มล้างทั้งหมดก็เรียก ask() เหมือนกัน */
+  var roomDlg = document.getElementById('roomdlg');
 
   function paintBar(){
     bar.hidden = false;
@@ -1210,11 +1213,11 @@
       document.getElementById('roomout').hidden = true;
     }
   }
-  function openDlg(){ dlg.hidden = false; document.getElementById('rcode').focus(); }
-  function closeDlg(){ dlg.hidden = true; document.getElementById('rmsg').textContent = ''; }
+  function openDlg(){ roomDlg.hidden = false; document.getElementById('rcode').focus(); }
+  function closeDlg(){ roomDlg.hidden = true; document.getElementById('rmsg').textContent = ''; }
   document.getElementById('roomjoin').addEventListener('click', openDlg);
   document.getElementById('rx').addEventListener('click', closeDlg);
-  dlg.addEventListener('click', function(e){ if (e.target === dlg) closeDlg(); });
+  roomDlg.addEventListener('click', function(e){ if (e.target === roomDlg) closeDlg(); });
   document.getElementById('roomout').addEventListener('click', async function(){
     if (!await ask('ออกจากห้อง',
       'งานที่เก็บบนระบบยังอยู่ กลับเข้ามาด้วยรหัสและชื่อเดิมก็เจอของเดิม ' +
