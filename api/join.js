@@ -15,13 +15,22 @@ module.exports = async (req, res) => {
   if (typeof body === 'string') { try { body = JSON.parse(body); } catch (e) { body = null; } }
   const code = clean(body?.code).toUpperCase();
   const name = clean(body?.name);
-  if (!code || !name) return res.status(400).json({ error: 'ต้องกรอกรหัสห้องและชื่อ' });
+  if (!name) return res.status(400).json({ error: 'ต้องกรอกชื่อ' });
   if (name.length > 60) return res.status(400).json({ error: 'ชื่อยาวเกินไป' });
 
   try {
     await init();
-    const room = (await q(`select * from bmc_room where code = $1`, [code])).rows[0];
-    if (!room) return res.status(404).json({ error: 'ไม่พบรหัสห้องนี้ ลองตรวจตัวสะกดอีกครั้ง' });
+    /* ไม่ส่งรหัสมาก็ได้ ใช้ห้องเริ่มต้นให้ นักเรียนจะได้ไม่ต้องจำหรือพิมพ์รหัสเลย
+       ครูตั้งว่าห้องไหนเป็นห้องเริ่มต้นได้จากหน้าของครู */
+    const room = code
+      ? (await q(`select * from bmc_room where code = $1`, [code])).rows[0]
+      : (await q(`select * from bmc_room where is_default limit 1`)).rows[0];
+    if (!room) {
+      return res.status(404).json({
+        error: code ? 'ไม่พบรหัสห้องนี้ ลองตรวจตัวสะกดอีกครั้ง'
+                    : 'ยังไม่ได้ตั้งห้องเริ่มต้น แจ้งครูให้ตั้งก่อน',
+      });
+    }
     if (room.expires_at && new Date(room.expires_at) < new Date()) {
       return res.status(410).json({ error: 'รหัสห้องนี้หมดอายุแล้ว' });
     }
@@ -30,7 +39,7 @@ module.exports = async (req, res) => {
        เทียบชื่อแบบไม่สนตัวพิมพ์ใหญ่เล็กและช่องว่างซ้ำ */
     let user = (await q(
       `select * from bmc_user where room_code = $1 and lower(name) = lower($2)`,
-      [code, name])).rows[0];
+      [room.code, name])).rows[0];
 
     /* ชื่อซ้ำเป็นจุดอ่อนเดียวที่เหลือของการเข้าห้องด้วยชื่อ
        ถ้าคนที่สองพิมพ์ชื่อตรงกับคนแรก เขาจะเปิดงานของคนแรกและเขียนทับทันที
@@ -50,8 +59,9 @@ module.exports = async (req, res) => {
         return res.status(409).json({ error: 'ห้องนี้เต็มแล้ว แจ้งครูเพื่อขอเพิ่มที่นั่ง' });
       }
       user = (await q(
-        `insert into bmc_user (room_code, name) values ($1,$2) returning *`, [code, name])).rows[0];
-      await q(`update bmc_room set used_count = used_count + 1 where code = $1`, [code]);
+        `insert into bmc_user (room_code, name) values ($1,$2) returning *`,
+        [room.code, name])).rows[0];
+      await q(`update bmc_room set used_count = used_count + 1 where code = $1`, [room.code]);
       await q(`insert into bmc_canvas (user_id, data) values ($1,'{}') on conflict (user_id) do nothing`,
         [user.id]);
     } else {
@@ -59,7 +69,7 @@ module.exports = async (req, res) => {
     }
 
     res.json({
-      token: sign({ uid: String(user.id), room: code, name: user.name }),
+      token: sign({ uid: String(user.id), room: room.code, name: user.name }),
       name: user.name, room: room.label,
       returning: !!user.created_at && Date.now() - new Date(user.created_at).getTime() > 60000,
     });

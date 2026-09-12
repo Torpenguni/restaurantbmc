@@ -725,3 +725,8 @@ dialog.ask .btn{padding:10px 17px;font-size:14.5px}
 .stalebar button{margin-left:auto;padding:7px 15px;border:0;border-radius:8px;
   background:#78350f;color:#fff;font:inherit;font-size:13.5px;cursor:pointer}
 @media print{.stalebar{display:none!important}}
+
+/* ปุ่มเปิดช่องรหัสห้อง ปกติซ่อนช่องไว้เพราะไม่ต้องกรอก */
+.rtoggle{margin:-4px 0 12px}
+.rtoggle button{border:0;background:none;padding:0;font:inherit;font-size:13px;
+  color:#0f766e;text-decoration:underline;cursor:pointer}

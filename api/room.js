@@ -58,6 +58,20 @@ module.exports = async (req, res) => {
       return res.status(201).json(row);
     }
 
+    /* ตั้งว่าห้องไหนเป็นห้องเริ่มต้น มีได้ห้องเดียว ปลดของเดิมก่อนแล้วตั้งใหม่
+       index บังคับไว้แล้วว่าซ้ำไม่ได้ ลำดับนี้จึงสำคัญ */
+    if (req.method === 'PUT') {
+      let body = req.body;
+      if (typeof body === 'string') { try { body = JSON.parse(body); } catch (e) { body = null; } }
+      const code = String(body?.code ?? '').trim().toUpperCase();
+      if (!code) return res.status(400).json({ error: 'bad-body' });
+      const found = (await q(`select 1 from bmc_room where code = $1`, [code])).rowCount;
+      if (!found) return res.status(404).json({ error: 'ไม่พบห้องนี้' });
+      await q(`update bmc_room set is_default = false where is_default`);
+      await q(`update bmc_room set is_default = true where code = $1`, [code]);
+      return res.json({ ok: true, code });
+    }
+
     /* ดูผังของนักเรียนคนหนึ่ง ใช้ตอนครูอยากอ่านงานจริง ไม่ใช่แค่ดูว่ากรอกไปกี่ช่อง */
     if (req.method === 'PATCH') {
       let body = req.body;

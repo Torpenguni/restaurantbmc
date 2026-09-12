@@ -39,8 +39,9 @@ pre{background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:12px;f
 <body>
 <div class="wrap">
   <h1>ห้องเรียน</h1>
-  <p class="sub">สร้างรหัสห้องให้นักเรียนใช้เข้าระบบ แล้วดูว่าใครกรอกไปถึงไหน
-    งานของนักเรียนเก็บบนระบบ เปิดเครื่องไหนก็ทำต่อได้</p>
+  <p class="sub">ดูว่าใครกรอกไปถึงไหน งานของนักเรียนเก็บบนระบบ เปิดเครื่องไหนก็ทำต่อได้<br>
+    นักเรียน<b>ไม่ต้องพิมพ์รหัส</b> — เปิดเว็บแล้วพิมพ์ชื่อ-นามสกุลก็เข้า <b>ห้องเริ่มต้น</b> ได้เลย
+    ถ้ามีหลายห้อง ส่ง<b>ลิงก์ของห้อง</b>ให้แต่ละกลุ่มแทนการบอกรหัส</p>
 
   <div class="card" id="gate">
     <h2>ใส่กุญแจของครู</h2>
@@ -132,14 +133,25 @@ pre{background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:12px;f
     $('rooms').innerHTML = '<table><thead><tr><th>รหัส</th><th>ชื่อห้อง</th>' +
       '<th>นักเรียน</th><th>หมดอายุ</th><th></th></tr></thead><tbody>' +
       d.rooms.map(function(r){
-        return '<tr><td class="code">' + esc(r.code) + '</td>' +
-          '<td>' + esc(r.label) + '</td>' +
+        return '<tr><td class="code">' + esc(r.code) +
+            (r.is_default ? '<br><span class="tiny">ห้องเริ่มต้น</span>' : '') + '</td>' +
+          '<td>' + esc(r.label) +
+            '<br><span class="tiny">ลิงก์สำหรับส่งให้นักเรียน: /canvas.html?r=' + esc(r.code) + '</span></td>' +
           '<td>' + r.students + (r.max_uses ? ' / ' + r.max_uses : '') + '</td>' +
           '<td class="tiny">' + (r.expires_at ? new Date(r.expires_at).toLocaleDateString('th-TH') : 'ไม่หมดอายุ') + '</td>' +
-          '<td><button class="plain" data-r="' + esc(r.code) + '">ดูนักเรียน</button></td></tr>';
+          '<td><button class="plain" data-r="' + esc(r.code) + '">ดูนักเรียน</button>' +
+            (r.is_default ? '' : ' <button class="plain" data-d="' + esc(r.code) +
+              '">ตั้งเป็นห้องเริ่มต้น</button>') + '</td></tr>';
       }).join('') + '</tbody></table>';
     Array.prototype.forEach.call($('rooms').querySelectorAll('[data-r]'), function(b){
       b.addEventListener('click', function(){ loadRoster(b.dataset.r); });
+    });
+    /* ห้องเริ่มต้นคือห้องที่นักเรียนเข้าได้โดยไม่ต้องพิมพ์รหัสและไม่ต้องใช้ลิงก์ */
+    Array.prototype.forEach.call($('rooms').querySelectorAll('[data-d]'), function(b){
+      b.addEventListener('click', async function(){
+        try { await api('PUT', '', { code:b.dataset.d }); loadRooms(); }
+        catch(e){ alert(e.message); }
+      });
     });
   }
 

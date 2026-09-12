@@ -31,6 +31,11 @@ async function init() {
       expires_at  timestamptz,
       created_at  timestamptz not null default now()
     );
+    alter table bmc_room add column if not exists is_default boolean not null default false;
+    /* ห้องเริ่มต้นใช้ตอนที่นักเรียนเปิดเว็บมาเฉย ๆ โดยไม่มีรหัสและไม่มีลิงก์
+       มีได้ห้องเดียว บังคับด้วย index ไม่ใช่ปล่อยให้โค้ดคุมเอง */
+    create unique index if not exists bmc_room_one_default
+      on bmc_room ((is_default)) where is_default;
     create table if not exists bmc_user (
       id          bigserial primary key,
       room_code   text not null references bmc_room(code) on delete cascade,

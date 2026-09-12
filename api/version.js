@@ -4,7 +4,7 @@
 
    ต้องขยับเลขนี้พร้อมกับ APP_V ใน canvas.html ทุกครั้งที่แก้อะไรที่คนใช้ต้องได้ของใหม่
    สองที่ก็จริง แต่โปรเจกต์นี้ไม่มีขั้นตอน build ที่จะฝังให้อัตโนมัติได้ */
-const VERSION = '2026-09-12.3';
+const VERSION = '2026-09-12.4';
 
 module.exports = async (req, res) => {
   res.setHeader('cache-control', 'no-store');

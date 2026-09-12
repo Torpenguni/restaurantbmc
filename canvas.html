@@ -19,18 +19,22 @@
   <div class="roomdlg noprint" id="roomdlg" hidden>
   <div class="roombox" role="dialog" aria-label="เข้าห้องเรียน">
     <h3>เข้าห้องเรียน</h3>
-    <p>กรอกรหัสห้องที่ครูให้ไว้ กับชื่อของตัวเอง แล้วงานจะถูกเก็บไว้บนระบบ
-      เปิดเครื่องไหนก็ทำต่อได้ ไม่ต้องมีอีเมล ไม่ต้องตั้งรหัสผ่าน</p>
-    <label class="rf"><span>รหัสห้อง</span>
+    <p>พิมพ์ชื่อ-นามสกุลของตัวเอง แล้วงานจะถูกเก็บไว้บนระบบ
+      เปิดเครื่องไหนก็ทำต่อได้ ไม่ต้องมีอีเมล ไม่ต้องตั้งรหัสผ่าน ไม่ต้องจำรหัส</p>
+    <label class="rf"><span>ชื่อ-นามสกุลของคุณ</span>
+      <input id="rname" autocomplete="name" placeholder="เช่น สมชาย ใจดี"></label>
+    <!-- รหัสห้องเป็นของเสริม ปกติไม่ต้องกรอก ระบบใช้ห้องเริ่มต้นให้
+         เปิดเผยไว้เฉพาะตอนที่ครูมีหลายห้องและให้รหัสมาเป็นพิเศษ -->
+    <p class="rtoggle"><button type="button" id="rmore">มีรหัสห้องจากครู</button></p>
+    <label class="rf" id="rcodewrap" hidden><span>รหัสห้อง</span>
       <input id="rcode" autocomplete="off" autocapitalize="characters" placeholder="เช่น K7M2QP"></label>
-    <label class="rf"><span>ชื่อของคุณ</span>
-      <input id="rname" autocomplete="name" placeholder="ชื่อ-นามสกุล หรือชื่อเล่นที่ครูรู้จัก"></label>
     <p class="rmsg" id="rmsg"></p>
     <div class="rbtns">
       <button class="btn btn-note" id="rgo" type="button">เข้าห้อง</button>
       <button class="btn btn-plain" id="rx" type="button">ยกเลิก</button>
     </div>
-    <p class="rnote">ใช้ชื่อเดิมทุกครั้งที่กลับมา ระบบใช้ชื่อเป็นตัวหาว่างานของคุณคืออันไหน</p>
+    <p class="rnote"><b>ใส่นามสกุลด้วยทุกครั้ง</b> และใช้ชื่อเดิมเสมอเมื่อกลับมา
+      เพราะระบบใช้ชื่อเป็นตัวหาว่างานของคุณคืออันไหน ชื่อไม่ตรงจะกลายเป็นคนใหม่</p>
   </div>
 </div>
 
@@ -1186,7 +1190,7 @@
      localStorage ยังเซฟต่อไปเสมอ เป็นตัวสำรองตอนเน็ตหลุด ไม่ใช่ทางเดียวที่งานจะรอด */
   /* เทียบเวอร์ชันกับเซิร์ฟเวอร์ ถ้าแท็บนี้เป็นของเก่าให้บอกตรง ๆ
      ต้องขยับให้ตรงกับ VERSION ใน api/version.js ทุกครั้งที่แก้ */
-  var APP_V = '2026-09-12.3';
+  var APP_V = '2026-09-12.4';
   var stale = false;
   (async function(){
     try {
@@ -1207,6 +1211,16 @@
       document.body.insertBefore(b, document.body.firstChild);
     } catch (e) {}
   })();
+
+  /* รหัสห้องที่รู้มาจากลิงก์ เช่น canvas.html?r=GXCB8W ครูส่งลิงก์นี้ให้ทั้งห้อง
+     จำไว้ในเครื่องด้วย ครั้งต่อไปเปิดเว็บเปล่า ๆ ก็ยังอยู่ห้องเดิม */
+  var roomHint = '';
+  try {
+    var qp = new URLSearchParams(location.search).get('r');
+    if (qp) { roomHint = qp.trim().toUpperCase();
+      try { localStorage.setItem('bmc-room-hint', roomHint); } catch(e){} }
+    else roomHint = localStorage.getItem('bmc-room-hint') || '';
+  } catch(e){}
 
   var TKEY = 'bmc-room-token';
   var tok = null, me = null, cloudTimer = null, lastSent = '';
@@ -1237,10 +1251,16 @@
       document.getElementById('roomout').hidden = true;
     }
   }
-  function openDlg(){ roomDlg.hidden = false; document.getElementById('rcode').focus(); }
+  function openDlg(){ roomDlg.hidden = false; document.getElementById('rname').focus(); }
   function closeDlg(){ roomDlg.hidden = true; document.getElementById('rmsg').textContent = ''; }
   document.getElementById('roomjoin').addEventListener('click', openDlg);
   document.getElementById('rx').addEventListener('click', closeDlg);
+  document.getElementById('rmore').addEventListener('click', function(){
+    var w = document.getElementById('rcodewrap');
+    w.hidden = !w.hidden;
+    if (!w.hidden) { document.getElementById('rcode').value = roomHint || ''; 
+      document.getElementById('rcode').focus(); }
+  });
   roomDlg.addEventListener('click', function(e){ if (e.target === roomDlg) closeDlg(); });
   document.getElementById('roomout').addEventListener('click', async function(){
     if (!await ask('ออกจากห้อง',
@@ -1253,9 +1273,17 @@
 
   document.getElementById('rgo').addEventListener('click', async function(){
     var msg = document.getElementById('rmsg');
-    var code = document.getElementById('rcode').value.trim().toUpperCase();
+    /* รหัสมาได้สามทาง จากลิงก์ที่ครูส่ง จากที่เคยใช้แล้วจำไว้ หรือกรอกเอง
+       ถ้าไม่มีทั้งสามทาง ส่งค่าว่างไปให้เซิร์ฟเวอร์เลือกห้องเริ่มต้นให้ */
+    var code = (document.getElementById('rcode').value || roomHint || '').trim().toUpperCase();
     var name = document.getElementById('rname').value.trim();
-    if (!code || !name) { msg.textContent = 'กรอกรหัสห้องและชื่อให้ครบ'; return; }
+    if (!name) { msg.textContent = 'พิมพ์ชื่อ-นามสกุลก่อน'; return; }
+    if (name.indexOf(' ') < 0) {
+      /* เตือนแต่ไม่ห้าม บางคนมีชื่อเดียวจริง ๆ และครูอาจให้ใส่เลขที่แทนนามสกุล */
+      msg.style.color = '#92400e';
+      msg.textContent = 'ใส่นามสกุลด้วยจะดีกว่า กันชื่อซ้ำกับเพื่อน · กดเข้าห้องอีกครั้งถ้ายืนยัน';
+      if (!msg.dataset.warned) { msg.dataset.warned = '1'; return; }
+    }
     var btn = document.getElementById('rgo');
     btn.disabled = true; msg.style.color = '#4b5563'; msg.textContent = 'กำลังเข้าห้อง…';
     try {
