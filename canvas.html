@@ -1184,6 +1184,30 @@
      เข้าห้องแล้วงานถูกเก็บบนระบบ เปิดเครื่องไหนก็ทำต่อได้
      ไม่เข้าห้องก็ใช้ได้ทุกอย่างเหมือนเดิม เก็บในเครื่องอย่างเดียว
      localStorage ยังเซฟต่อไปเสมอ เป็นตัวสำรองตอนเน็ตหลุด ไม่ใช่ทางเดียวที่งานจะรอด */
+  /* เทียบเวอร์ชันกับเซิร์ฟเวอร์ ถ้าแท็บนี้เป็นของเก่าให้บอกตรง ๆ
+     ต้องขยับให้ตรงกับ VERSION ใน api/version.js ทุกครั้งที่แก้ */
+  var APP_V = '2026-09-12.3';
+  var stale = false;
+  (async function(){
+    try {
+      var r = await fetch('/api/version', { cache:'no-store' });
+      if (!r.ok) return;
+      var d = await r.json();
+      if (!d.v || d.v === APP_V) return;
+      stale = true;
+      var b = document.createElement('div');
+      b.className = 'stalebar noprint';
+      b.innerHTML = '<span>หน้านี้เป็นเวอร์ชันเก่าที่เบราว์เซอร์เก็บไว้ ' +
+        'บางปุ่มอาจใช้ไม่ได้</span>' +
+        '<button type="button">โหลดหน้าใหม่</button>';
+      b.querySelector('button').addEventListener('click', function(){
+        /* ใส่พารามิเตอร์กันแคชไปด้วย การกดรีเฟรชธรรมดาบางทีได้ของเดิมจากหน่วยความจำของแท็บ */
+        location.replace(location.pathname + '?v=' + Date.now());
+      });
+      document.body.insertBefore(b, document.body.firstChild);
+    } catch (e) {}
+  })();
+
   var TKEY = 'bmc-room-token';
   var tok = null, me = null, cloudTimer = null, lastSent = '';
   /* ห้ามส่งขึ้นระบบจนกว่าจะดึงของบนระบบมาดูก่อน
@@ -1265,7 +1289,11 @@
       /* บอกสาเหตุจริงไปด้วย "ต่อระบบไม่ได้" เฉย ๆ ทำให้ไล่ไม่ได้ว่าพังเพราะอะไร
          ทั้งของคนใช้และของคนแก้ */
       msg.style.color = '#b42318';
-      msg.textContent = 'ต่อระบบไม่ได้ · ' + (err && (err.name + ': ' + err.message) || 'ไม่ทราบสาเหตุ');
+      /* error ฝั่งเบราว์เซอร์บนหน้าที่เป็นเวอร์ชันเก่า สาเหตุคือแท็บเก่า ไม่ใช่เน็ตหรือเซิร์ฟเวอร์
+         บอกให้ตรงสาเหตุ ไม่งั้นคนใช้จะลองกดซ้ำไปเรื่อย ๆ โดยไม่มีทางสำเร็จ */
+      msg.textContent = stale
+        ? 'หน้านี้เป็นเวอร์ชันเก่า กดปุ่มโหลดหน้าใหม่ด้านบนก่อน แล้วลองอีกครั้ง'
+        : 'ต่อระบบไม่ได้ · ' + (err && (err.name + ': ' + err.message) || 'ไม่ทราบสาเหตุ');
       btn.disabled = false;
       if (window.console) console.error('join', err);
     }

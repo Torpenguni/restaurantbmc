@@ -717,3 +717,11 @@ dialog.ask .btn{padding:10px 17px;font-size:14.5px}
 .rbtns{display:flex;gap:8px}
 .rnote{margin:12px 0 0;font-size:12.5px;color:#6b7280;line-height:1.6}
 @media print{.roombar,.roomdlg{display:none!important}}
+
+/* แถบเตือนว่าหน้านี้เป็นของเก่าที่เบราว์เซอร์เก็บไว้ */
+.stalebar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  background:#fef3c7;border-bottom:1px solid #fcd34d;color:#78350f;
+  padding:11px 18px;font-size:14px}
+.stalebar button{margin-left:auto;padding:7px 15px;border:0;border-radius:8px;
+  background:#78350f;color:#fff;font:inherit;font-size:13.5px;cursor:pointer}
+@media print{.stalebar{display:none!important}}
